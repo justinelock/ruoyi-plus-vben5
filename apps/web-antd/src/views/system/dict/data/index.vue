@@ -174,7 +174,9 @@ onBeforeUnmount(() => {
           >
             {{ $t('pages.common.edit') }}
           </action-button>
+          <!-- 这里数据会不一致 必须加key标识 -->
           <Popconfirm
+            :key="row.dictCode"
             placement="left"
             title="确认删除？"
             @confirm="handleDelete(row)"
