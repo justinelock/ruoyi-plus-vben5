@@ -128,9 +128,14 @@ onMounted(() => {
     dictType.value = value;
     await tableApi.query();
   });
+  emitter.on('reset', async () => {
+    dictType.value = '';
+    await tableApi.reload();
+  });
 });
 onBeforeUnmount(() => {
   emitter.off('rowClick');
+  emitter.off('reset');
 });
 </script>
 
