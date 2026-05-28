@@ -172,7 +172,7 @@ useVersionUpdate();
         :notifications="notifyStore.notifications"
         @clear="notifyStore.clearAllMessage"
         @make-all="notifyStore.setAllRead"
-        @read="notifyStore.setRead"
+        @click="notifyStore.setRead"
         @view-all="handleViewAll"
         @remove="notifyStore.removeMessage"
       />

@@ -30,8 +30,8 @@ withDefaults(
 
 const emit = defineEmits<{
   clear: [];
+  click: [NotificationItem];
   makeAll: [];
-  onClick: [NotificationItem];
   read: [NotificationItem];
   remove: [NotificationItem];
   viewAll: [];
@@ -63,7 +63,7 @@ const handleClear = () => {
         <VbenIconButton class="bell-button relative text-foreground">
           <span
             v-if="dot"
-            class="absolute top-0.5 right-0.5 size-2 rounded-sm bg-primary"
+            class="absolute top-0.5 right-0.5 size-2 rounded-full bg-primary"
           ></span>
           <Bell class="size-4" />
         </VbenIconButton>
@@ -86,12 +86,12 @@ const handleClear = () => {
           <template v-for="item in notifications" :key="item.title">
             <li
               class="relative flex w-full cursor-pointer items-start gap-5 border-t border-border p-3 hover:bg-accent"
-              @click="emit('onClick', item)"
+              @click="emit('click', item)"
             >
               <slot name="content" :item="item">
                 <span
                   v-if="!item.isRead"
-                  class="absolute top-2 right-2 size-2 rounded-sm bg-primary"
+                  class="absolute top-2 right-2 size-2 rounded-full bg-primary"
                 ></span>
 
                 <span
@@ -117,7 +117,7 @@ const handleClear = () => {
                   <slot name="action" :item="item">
                     <slot name="action-prepend" :item="item"></slot>
                     <VbenIconButton
-                      v-if="!item.isRead"
+                      v-if="false"
                       size="xs"
                       variant="ghost"
                       class="h-6 px-2"
