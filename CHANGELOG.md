@@ -4,6 +4,8 @@
 
 - 替换logo和ico
 - 消息通知 点击已读优化
+- 登录页按钮/checkbox使用antdv-next组件替代Vben(shadcn)组件
+- 登录页diable逻辑优化
 
 ## 2.0.2
 
