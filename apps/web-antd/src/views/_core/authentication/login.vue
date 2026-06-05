@@ -36,9 +36,11 @@ const captchaInfo = ref<CaptchaResponse>({
 const captchaLoading = ref(false);
 
 async function loadCaptcha() {
-  try {
+  // 防止请求过快产生闪烁问题
+  const delayLoading = setTimeout(() => {
     captchaLoading.value = true;
-
+  }, 300);
+  try {
     const resp = await captchaImage();
     if (resp.captchaEnabled) {
       resp.img = `data:image/png;base64,${resp.img}`;
@@ -48,6 +50,7 @@ async function loadCaptcha() {
     console.error(error);
   } finally {
     captchaLoading.value = false;
+    clearTimeout(delayLoading);
   }
 }
 
@@ -56,14 +59,19 @@ const tenantInfo = ref<TenantResp>({
   voList: [],
 });
 
+const tenantLoading = ref(false);
 async function loadTenant() {
+  tenantLoading.value = true;
+
   const resp = await tenantList();
   tenantInfo.value = resp;
   // 选中第一个租户
-  if (resp.tenantEnabled && resp.voList.length > 0) {
-    const firstTenantId = resp.voList[0]!.tenantId;
+  if (resp.tenantEnabled && resp.voList.length > 0 && resp.voList[0]) {
+    const firstTenantId = resp.voList[0].tenantId;
     loginFormRef.value?.getFormApi().setFieldValue('tenantId', firstTenantId);
   }
+  // 并没有加try catch 租户加载失败不应该激活submit
+  tenantLoading.value = false;
 }
 
 onMounted(async () => {
@@ -180,7 +188,11 @@ async function handleAccountLogin(values: LoginAndRegisterParams) {
     :show-third-party-login="true"
     :checkbox-component="Checkbox"
     :button-component="Button"
-    :submit-btn-extra-props="{ type: 'primary', size: 'large' }"
+    :submit-btn-extra-props="{
+      type: 'primary',
+      size: 'large',
+      disabled: captchaLoading || tenantLoading,
+    }"
     :mobile-login-btn-extra-props="{ size: 'large' }"
     :qrcode-login-btn-extra-props="{ size: 'large' }"
     @submit="handleAccountLogin"
