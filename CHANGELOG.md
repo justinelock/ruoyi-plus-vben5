@@ -7,6 +7,18 @@
 - 登录页按钮/checkbox使用antdv-next组件替代Vben(shadcn)组件
 - 登录页diable逻辑优化
 
+**FEATURE**
+
+- 新增`Tiptap`富文本 为了兼容仍然保留`Tinymce` 强烈建议任选其一
+
+**备注**
+
+删除Tinymce需要的文件
+
+- apps/web-antd/public/tinymce 删除
+- apps/web-antd/src/components/tinymce 删除
+- apps/web-antd/src/adapter/component/index.ts 做对应的替换
+
 ## 2.0.2
 
 **BUG FIX**
