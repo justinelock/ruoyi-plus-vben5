@@ -93,6 +93,45 @@ export const overridesPreferences = defineOverridesPreferences({
     colorWarning: 'hsl(40, 96%, 53%)',
   },
   /**
+   * ---------------------------------------------------------------------------
+   * 菜单切换 / 页面路由过渡动画（点击侧边栏打开页面时的效果）
+   * ---------------------------------------------------------------------------
+   * 【改这里】本文件 `transition` 段为项目级默认，覆盖 Vben 框架默认值。
+   *
+   * 相关文件（排查或自定义时对照）：
+   * - 本文件：apps/web-antd/src/preferences.ts（项目覆盖配置，优先改这里）
+   * - 框架默认：packages/@core/preferences/src/config.ts（默认 name: fade-slide）
+   * - CSS 定义：packages/@core/base/design/src/css/transition.css
+   * - 渲染位置：packages/effects/layouts/src/basic/content/content.vue（<Transition>）
+   * - 逻辑封装：packages/effects/layouts/src/hooks/index.ts（getTransitionName）
+   * - 偏好设置 UI：右上角齿轮 → 动画 → 页面切换动画（会写入 localStorage，可能覆盖本配置）
+   *
+   * name 可选值（内置）：
+   * - fade        纯淡入淡出，无位移（后台管理推荐，观感最稳）
+   * - fade-slide  旧页向右滑出，新页从左侧滑入（Vben 框架默认）
+   * - fade-up     自下而上滑入
+   * - fade-down   自上而下滑入
+   *
+   * 自定义动画：在 transition.css 新增 .xxx-enter-active 等类名，再把 name 设为 'xxx'。
+   *
+   * !!! 修改后请重启 pnpm dev:antd，并清空浏览器 localStorage（键名含 vben/preferences）
+   *     否则偏好面板或历史缓存可能仍用旧动画。
+   * ---------------------------------------------------------------------------
+   */
+  transition: {
+    /** 是否启用页面切换过渡动画；false 则菜单跳转无动画 */
+    enable: true,
+    /** 页面切换时的全屏 loading（与顶部进度条独立） */
+    loading: false,
+    /**
+     * 过渡动画名称，对应 transition.css 中的 CSS 类前缀
+     * @see packages/@core/base/design/src/css/transition.css
+     */
+    name: 'fade',
+    /** 顶部 NProgress 进度条（路由跳转时顶部细条，与 transition 动画无关） */
+    progress: true,
+  },
+  /**
    * !!! 更改配置后请清空浏览器缓存
    * 在这里更换logo
    * source可选值：
