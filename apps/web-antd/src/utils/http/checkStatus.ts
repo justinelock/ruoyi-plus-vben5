@@ -2,6 +2,7 @@ import type { AxiosRequestConfig } from 'axios';
 
 import { $t } from '@vben/locales';
 
+import { handleUnauthorizedLogout } from './helper';
 import { showAntdMessage } from './popup';
 
 export function checkStatus(
@@ -17,8 +18,9 @@ export function checkStatus(
       break;
     }
     case 401: {
-      errorMessage = $t('ui.fallback.http.unauthorized');
-      break;
+      // 兼容后端仍返回 HTTP 401 的场景：执行登出并跳转登录页
+      handleUnauthorizedLogout();
+      return;
     }
     case 403: {
       errorMessage = $t('ui.fallback.http.forbidden');
