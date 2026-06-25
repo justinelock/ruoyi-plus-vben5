@@ -4,11 +4,14 @@ import type { TableColumnsType } from 'antdv-next';
 
 import { ref } from 'vue';
 
-import { useVbenDrawer } from '@vben/common-ui';
+import { useVbenDrawer, useVbenModal } from '@vben/common-ui';
 
 import { Space, Table } from 'antdv-next';
 
 import { memberWalletList } from '#/api/member/wallet';
+
+import type { WalletActionType } from './wallet-action-data';
+import WalletActionModal from './wallet-action-modal.vue';
 
 const filterKeyword = ref('');
 const filterUserId = ref('');
@@ -16,8 +19,14 @@ const loading = ref(false);
 const walletRows = ref<MemberWallet[]>([]);
 const drawerTitle = ref('用户钱包');
 
-function handleWalletAction(_action: string, _row: MemberWallet) {
-  window.message.info('该操作待后端接口接入');
+const [WalletActionModalComp, walletActionModalApi] = useVbenModal({
+  connectedComponent: WalletActionModal,
+});
+
+/** 打开合并操作弹窗（±款、开/关账户等单按钮入口） */
+function handleOpenWalletAction(actionType: WalletActionType, row: MemberWallet) {
+  walletActionModalApi.setData({ actionType, wallet: row });
+  walletActionModalApi.open();
 }
 
 function formatAmount(value?: number) {
@@ -61,7 +70,7 @@ const walletColumns: TableColumnsType<MemberWallet> = [
   {
     key: 'action',
     title: '操作',
-    width: 420,
+    width: 300,
   },
 ];
 
@@ -111,68 +120,40 @@ const [BasicDrawer, drawerApi] = useVbenDrawer({
         <template v-else-if="column.key === 'drawTicket'">
           {{ record.drawTicket ?? 0 }}
         </template>
-        <template v-if="column.key === 'action'">
+        <template v-else-if="column.key === 'action'">
           <Space class="py-2" :size="4" wrap>
             <a-button
               size="small"
               type="link"
-              @click="handleWalletAction('addAmount', record)"
+              @click="handleOpenWalletAction('balance', record)"
             >
-              加款
+              ±款
             </a-button>
             <a-button
               size="small"
               type="link"
-              @click="handleWalletAction('subAmount', record)"
+              @click="handleOpenWalletAction('account', record)"
             >
-              减款
+              开/关账户
             </a-button>
             <a-button
               size="small"
               type="link"
-              @click="handleWalletAction('openAccount', record)"
+              @click="handleOpenWalletAction('frozen', record)"
             >
-              开账户
+              冻/解金额
             </a-button>
             <a-button
               size="small"
               type="link"
-              @click="handleWalletAction('closeAccount', record)"
+              @click="handleOpenWalletAction('ticket', record)"
             >
-              关账户
+              ±抽奖券
             </a-button>
             <a-button
               size="small"
               type="link"
-              @click="handleWalletAction('freezeAmount', record)"
-            >
-              冻金额
-            </a-button>
-            <a-button
-              size="small"
-              type="link"
-              @click="handleWalletAction('unfreezeAmount', record)"
-            >
-              解金额
-            </a-button>
-            <a-button
-              size="small"
-              type="link"
-              @click="handleWalletAction('addTicket', record)"
-            >
-              加抽奖券
-            </a-button>
-            <a-button
-              size="small"
-              type="link"
-              @click="handleWalletAction('subTicket', record)"
-            >
-              减抽奖券
-            </a-button>
-            <a-button
-              size="small"
-              type="link"
-              @click="handleWalletAction('transfer', record)"
+              @click="handleOpenWalletAction('transfer', record)"
             >
               划转
             </a-button>
@@ -180,5 +161,6 @@ const [BasicDrawer, drawerApi] = useVbenDrawer({
         </template>
       </template>
     </Table>
+    <WalletActionModalComp @reload="loadWalletRows" />
   </BasicDrawer>
 </template>

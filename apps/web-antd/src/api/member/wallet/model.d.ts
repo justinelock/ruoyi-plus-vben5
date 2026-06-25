@@ -25,3 +25,14 @@ export interface MemberWalletQuery {
   frozenStatus?: string;
   [key: string]: any;
 }
+
+/** 钱包抽屉操作提交（弹窗表单） */
+export interface MemberWalletActionReq {
+  actionType: 'account' | 'balance' | 'frozen' | 'ticket' | 'transfer';
+  walletId?: string;
+  direction?: string;
+  amount?: number;
+  quantity?: number;
+  targetAccountType?: string;
+  remark?: string;
+}
