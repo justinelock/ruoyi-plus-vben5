@@ -30,9 +30,17 @@ export interface MemberUserQuery extends PageQuery {
   createTime?: string[];
 }
 
-/** 用户列表顶部活跃统计（对齐 MemberUserStatsResp） */
+/** 用户列表顶部活跃统计 */
 export interface MemberUserStats {
   totalOnlineUsers: number;
   todayLogins: number;
   totalActiveSessions: number;
+}
+
+/** 重置业务用户密码 */
+export interface MemberUserResetPwdParam {
+  id: ID;
+  password: string;
+  /** 1=登录密码 2=交易密码 */
+  type?: number;
 }

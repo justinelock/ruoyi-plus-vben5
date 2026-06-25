@@ -1,35 +1,41 @@
 <script setup lang="ts">
 import type { VbenFormProps } from '@vben/common-ui';
 
+import type { MenuProps } from 'antdv-next';
+
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { MemberUser } from '#/api/member/user/model';
 
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
-import { Page, useVbenDrawer } from '@vben/common-ui';
+import { useAccess } from '@vben/access';
+import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
 import { $t } from '@vben/locales';
 
-import { Space, Tag } from 'antdv-next';
+import { Dropdown, Popconfirm, Space, Tag } from 'antdv-next';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { memberUserList, memberUserStats } from '#/api/member/user';
+import {
+  memberUserList,
+  memberUserRemove,
+  memberUserStats,
+} from '#/api/member/user';
 
 import { createColumns, querySchema } from './data';
+import userResetPwdModal from './user-reset-pwd-modal.vue';
 import UserWalletDrawer from './user-wallet-drawer.vue';
 
 /** 是否查看已删用户（切换后重新查询） */
 const showDeleted = ref(false);
 
-/** 标题 Tag：近 5 分钟全局活跃用户数（GET /member/user/stats，Redis 全局，与列表筛选无关） */
+/** 标题 Tag：近 5 分钟全局活跃用户数 */
 const totalActiveSessions = ref(0);
 
-/** 拉取 Redis 全局活跃统计 */
 async function loadActiveSessions() {
   const stats = await memberUserStats();
   totalActiveSessions.value = stats.totalActiveSessions ?? 0;
 }
 
-/** 单行 inline 筛选：关键词 + 认证状态 + 时间，与操作按钮同一行 */
 const formOptions: VbenFormProps = {
   schema: querySchema(),
   layout: 'inline',
@@ -65,7 +71,6 @@ const [WalletDrawer, walletDrawerApi] = useVbenDrawer({
   destroyOnClose: true,
 });
 
-/** 右侧抽屉：按 userId 拉取钱包列表 */
 function handleOpenWallet(row: MemberUser) {
   walletDrawerApi.setData({
     userId: row.id,
@@ -94,7 +99,6 @@ const gridOptions: VxeGridProps = {
           deleted: showDeleted.value ? '1' : '0',
           ...formValues,
         };
-        // 列表与 Redis 全局 stats 并行拉取（stats 不受下方筛选影响）
         const [listResp] = await Promise.all([
           memberUserList(params),
           loadActiveSessions(),
@@ -120,12 +124,22 @@ const [BasicTable, tableApi] = useVbenVxeGrid({
   gridOptions,
 });
 
-function handleView(_row: MemberUser) {
-  // 详情页待业务接口就绪后接入
-}
+const [UserResetPwdModal, userResetPwdModalApi] = useVbenModal({
+  connectedComponent: userResetPwdModal,
+});
 
 function handleEdit(_row: MemberUser) {
   // 编辑抽屉待业务接口就绪后接入
+}
+
+async function handleDelete(row: MemberUser) {
+  await memberUserRemove([row.id]);
+  await tableApi.query();
+}
+
+function handleResetPwd(row: MemberUser) {
+  userResetPwdModalApi.setData({ record: row });
+  userResetPwdModalApi.open();
 }
 
 function handleExport() {
@@ -133,9 +147,23 @@ function handleExport() {
 }
 
 function handleToggleDeleted() {
-  // 切换「已删用户」视图并刷新列表
   showDeleted.value = !showDeleted.value;
   tableApi.reload();
+}
+
+const { hasAccessByCodes } = useAccess();
+const menuItems = computed(() => {
+  const items: MenuProps['items'] = [];
+  if (hasAccessByCodes(['member:list:list'])) {
+    items.push({ key: 'resetPwd', label: '重置密码' });
+  }
+  return items;
+});
+
+function handleMenuClick(key: string, row: MemberUser) {
+  if (key === 'resetPwd') {
+    handleResetPwd(row);
+  }
 }
 </script>
 
@@ -168,19 +196,38 @@ function handleToggleDeleted() {
         <Space>
           <action-button
             v-access:code="['member:list:list']"
-            @click.stop="handleView(row)"
-          >
-            详情
-          </action-button>
-          <action-button
-            v-access:code="['member:list:list']"
             @click.stop="handleEdit(row)"
           >
             {{ $t('pages.common.edit') }}
           </action-button>
+          <Popconfirm
+            placement="left"
+            title="确认删除？"
+            @confirm="handleDelete(row)"
+          >
+            <action-button
+              danger
+              v-access:code="['member:list:list']"
+              @click.stop=""
+            >
+              {{ $t('pages.common.delete') }}
+            </action-button>
+          </Popconfirm>
         </Space>
+        <Dropdown
+          placement="bottomRight"
+          :menu="{
+            items: menuItems,
+            onClick: (info) => handleMenuClick(String(info.key), row),
+          }"
+        >
+          <a-button size="small" type="link">
+            {{ $t('pages.common.more') }}
+          </a-button>
+        </Dropdown>
       </template>
     </BasicTable>
     <WalletDrawer />
+    <UserResetPwdModal @reload="tableApi.query()" />
   </Page>
 </template>
