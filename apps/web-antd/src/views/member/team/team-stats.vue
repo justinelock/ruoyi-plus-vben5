@@ -5,20 +5,20 @@ defineProps<{
   stats: MemberTeamStats;
 }>();
 
-/** 代理统计卡片配置（具体颜色见下方 scoped 样式，亮/暗主题分别定义） */
+/** 代理统计卡片配置 */
 const cards: Array<{
-  key: keyof MemberTeamStats | 'totalBalance';
+  key: keyof MemberTeamStats;
   label: string;
   money?: boolean;
   tone: string;
 }> = [
-  { key: 'level1Count', label: '一级代理', tone: 'level1' },
-  { key: 'level2Count', label: '二级代理', tone: 'level2' },
-  { key: 'level3Count', label: '三级代理', tone: 'level3' },
-  { key: 'level4Count', label: '四级代理', tone: 'level4' },
-  { key: 'level5Count', label: '五级代理', tone: 'level5' },
+  { key: 'level1Members', label: '一级代理', tone: 'level1' },
+  { key: 'level2Members', label: '二级代理', tone: 'level2' },
+  { key: 'level3Members', label: '三级代理', tone: 'level3' },
+  { key: 'level4Members', label: '四级代理', tone: 'level4' },
+  { key: 'level5Members', label: '五级代理', tone: 'level5' },
   { key: 'totalMembers', label: '团队成员总数', tone: 'members' },
-  { key: 'totalBalance', label: '团队总余额', tone: 'balance', money: true },
+  { key: 'totalTeamBalance', label: '团队总余额', tone: 'balance', money: true },
 ];
 </script>
 
@@ -36,7 +36,7 @@ const cards: Array<{
         :class="{ 'team-stat-card__value--money': item.money }"
       >
         <template v-if="item.money">
-          $ {{ stats.totalBalance || '0.00' }}
+          $ {{ stats.totalTeamBalance ?? 0 }}
         </template>
         <template v-else>{{ stats[item.key] ?? 0 }}</template>
       </div>
@@ -45,7 +45,6 @@ const cards: Array<{
 </template>
 
 <style scoped>
-/* 卡片底色与边框：opacity 0.8，亮色 / 暗色分别配色 */
 .team-stat-card {
   background-color: rgb(var(--team-stat-bg) / 80%);
   border-color: rgb(var(--team-stat-border) / 45%);
@@ -63,7 +62,6 @@ const cards: Array<{
   color: rgb(var(--team-stat-money));
 }
 
-/* 亮色主题 */
 .team-stat-card--level1 {
   --team-stat-bg: 237 233 254;
   --team-stat-border: 196 181 253;
@@ -120,7 +118,6 @@ const cards: Array<{
   --team-stat-money: 5 150 105;
 }
 
-/* 暗色主题 */
 .dark .team-stat-card--level1 {
   --team-stat-bg: 76 29 149;
   --team-stat-border: 167 139 250;

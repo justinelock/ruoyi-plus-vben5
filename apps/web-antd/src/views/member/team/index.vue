@@ -19,13 +19,13 @@ import TeamStats from './team-stats.vue';
 
 // 1. 顶部统计卡片：GET /member/team/stats，与列表筛选条件联动
 const defaultStats: MemberTeamStats = {
-  level1Count: 0,
-  level2Count: 0,
-  level3Count: 0,
-  level4Count: 0,
-  level5Count: 0,
+  level1Members: 0,
+  level2Members: 0,
+  level3Members: 0,
+  level4Members: 0,
+  level5Members: 0,
   totalMembers: 0,
-  totalBalance: '0.00',
+  totalTeamBalance: 0,
 };
 
 const teamStats = ref<MemberTeamStats>({ ...defaultStats });

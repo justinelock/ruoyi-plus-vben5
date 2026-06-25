@@ -1,19 +1,23 @@
 import type { BaseEntity, PageQuery } from '#/api/common';
 
-/** 业务用户列表行 */
+/** 业务用户列表行（对齐 MemberUserItem） */
 export interface MemberUser {
   id: string;
-  userName: string;
-  totalBalance: string;
-  investPosition: string;
-  investDividend: string;
+  username: string;
   realName: string;
-  /** 1 在线 / 0 离线 */
-  onlineStatus: string;
-  status: string;
+  idCard: string;
+  agentLevel: number;
   inviteCode: string;
-  createTime: string;
-  lastLoginTime: string;
+  commissionRate: number;
+  totalCommission: number;
+  totalBalance: number;
+  fundPositionAmount: number;
+  fundPositionDividend: number;
+  status: string;
+  /** 1 在线 / 0 离线 */
+  onlineStatus: number;
+  lastLogin: string;
+  createdAt: string;
 }
 
 export interface MemberUserQuery extends PageQuery {
@@ -26,7 +30,9 @@ export interface MemberUserQuery extends PageQuery {
   createTime?: string[];
 }
 
-/** 用户列表顶部「活跃用户」统计 */
+/** 用户列表顶部活跃统计（对齐 MemberUserStatsResp） */
 export interface MemberUserStats {
+  totalOnlineUsers: number;
+  todayLogins: number;
   totalActiveSessions: number;
 }

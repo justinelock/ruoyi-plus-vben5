@@ -71,8 +71,8 @@ export const querySchema: FormSchemaGetter = () => [
 
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
-  { field: 'userName', title: '用户名', minWidth: 120 },
-  { field: 'phoneNumber', title: '手机号', minWidth: 120 },
+  { field: 'username', title: '用户名', minWidth: 120 },
+  { field: 'mobile', title: '手机号', minWidth: 120 },
   {
     field: 'realName',
     title: '真实姓名',
@@ -104,8 +104,8 @@ export const columns: VxeGridProps['columns'] = [
     minWidth: 90,
     slots: {
       default: ({ row }) => (
-        <Tag color={row.frozen === '1' ? 'error' : 'success'}>
-          {row.frozen === '1' ? '是' : '否'}
+        <Tag color={row.frozen ? 'error' : 'success'}>
+          {row.frozen ? '是' : '否'}
         </Tag>
       ),
     },
@@ -113,15 +113,15 @@ export const columns: VxeGridProps['columns'] = [
   { field: 'version', title: '版本号', minWidth: 80 },
   { field: 'currency', title: '币种', minWidth: 80 },
   {
-    field: 'lotteryCount',
+    field: 'drawTicket',
     title: '抽奖券数量',
     minWidth: 100,
     formatter({ cellValue }) {
-      return cellValue ?? '0';
+      return cellValue ?? 0;
     },
   },
-  { field: 'createTime', title: '创建时间', minWidth: 160 },
-  { field: 'updateTime', title: '更新时间', minWidth: 160 },
+  { field: 'createdAt', title: '创建时间', minWidth: 160 },
+  { field: 'updatedAt', title: '更新时间', minWidth: 160 },
   {
     field: 'action',
     fixed: 'right',

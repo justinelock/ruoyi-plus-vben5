@@ -1,25 +1,23 @@
-/** 实名认证列表行 */
+/** 实名认证列表行（对齐 MemberKycItem） */
 export interface MemberKyc {
   id: string;
-  userName: string;
+  userId: string;
+  username: string;
+  mobile: string;
   realName: string;
-  phoneNumber: string;
   idCardNo: string;
-  /** 身份证正面照 URL */
   idCardFront: string;
-  /** 身份证反面照 URL */
   idCardBack: string;
-  /** 0 未认证 / 1 已认证 / 2 认证中 / 3 已拒绝 */
-  authStatus: string;
+  status: string;
   rejectReason: string;
-  submitTime: string;
-  authTime: string;
+  verifiedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface MemberKycQuery {
   pageNum?: number;
   pageSize?: number;
-  /** 用户名 / 手机号 / 身份证号 */
   keyword?: string;
   authStatus?: string;
   submitTime?: string[];

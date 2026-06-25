@@ -43,7 +43,7 @@ export const querySchema: FormSchemaGetter = () => [
 
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
-  { field: 'userName', title: '用户名', minWidth: 120 },
+  { field: 'username', title: '用户名', minWidth: 120 },
   {
     field: 'balance',
     title: '余额',
@@ -61,31 +61,34 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'parentAgent',
+    field: 'agent',
     title: '上级代理',
     minWidth: 110,
     formatter({ cellValue }) {
-      return cellValue || '-';
+      if (!cellValue) {
+        return '-';
+      }
+      return cellValue.username || '-';
     },
   },
-  { field: 'agentLevel1', title: '一级代理', minWidth: 100 },
-  { field: 'agentLevel2', title: '二级代理', minWidth: 100 },
-  { field: 'agentLevel3', title: '三级代理', minWidth: 100 },
-  { field: 'agentLevel4', title: '四级代理', minWidth: 100 },
-  { field: 'agentLevel5', title: '五级代理', minWidth: 100 },
-  { field: 'agentTier', title: '代理层级', minWidth: 90 },
+  { field: 'level1Members', title: '一级成员', minWidth: 90 },
+  { field: 'level2Members', title: '二级成员', minWidth: 90 },
+  { field: 'level3Members', title: '三级成员', minWidth: 90 },
+  { field: 'level4Members', title: '四级成员', minWidth: 90 },
+  { field: 'level5Members', title: '五级成员', minWidth: 90 },
+  { field: 'agentLevel', title: '代理层级', minWidth: 90 },
   {
-    field: 'subTeamCount',
-    title: '下级团队总数',
-    minWidth: 110,
+    field: 'teamSize',
+    title: '团队规模',
+    minWidth: 90,
     formatter({ cellValue }) {
-      return cellValue ?? '0';
+      return cellValue ?? 0;
     },
   },
   {
-    field: 'subTeamBalance',
-    title: '下级团队总余额',
-    minWidth: 130,
+    field: 'totalTeamBalance',
+    title: '团队总余额',
+    minWidth: 110,
     formatter({ cellValue }) {
       return cellValue ?? '0.00';
     },
@@ -98,7 +101,7 @@ export const columns: VxeGridProps['columns'] = [
       default: ({ row }) => renderDict(row.status, DictEnum.SYS_NORMAL_DISABLE),
     },
   },
-  { field: 'registerTime', title: '注册时间', minWidth: 160 },
+  { field: 'createdAt', title: '注册时间', minWidth: 160 },
   {
     field: 'action',
     fixed: 'right',

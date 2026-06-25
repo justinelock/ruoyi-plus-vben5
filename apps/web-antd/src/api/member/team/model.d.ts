@@ -1,29 +1,39 @@
-export interface MemberTeam {
+export interface MemberTeamAgent {
   id: string;
-  userName: string;
-  balance: string;
+  username: string;
   realName: string;
-  parentAgent: string;
-  agentLevel1: string;
-  agentLevel2: string;
-  agentLevel3: string;
-  agentLevel4: string;
-  agentLevel5: string;
-  agentTier: string;
-  subTeamCount: string;
-  subTeamBalance: string;
-  status: string;
-  registerTime: string;
 }
 
+/** 团队列表行（对齐 MemberTeamItem） */
+export interface MemberTeam {
+  id: string;
+  username: string;
+  agent?: MemberTeamAgent;
+  realName: string;
+  level: number;
+  status: string;
+  teamSize: number;
+  level1Members: number;
+  level2Members: number;
+  level3Members: number;
+  level4Members: number;
+  level5Members: number;
+  agentLevel: number;
+  walletCount: number;
+  balance: number;
+  totalTeamBalance: number;
+  createdAt: string;
+}
+
+/** 团队统计（对齐 MemberTeamStatsResp） */
 export interface MemberTeamStats {
-  level1Count: number;
-  level2Count: number;
-  level3Count: number;
-  level4Count: number;
-  level5Count: number;
   totalMembers: number;
-  totalBalance: string;
+  level1Members: number;
+  level2Members: number;
+  level3Members: number;
+  level4Members: number;
+  level5Members: number;
+  totalTeamBalance: number;
 }
 
 export interface MemberTeamQuery {

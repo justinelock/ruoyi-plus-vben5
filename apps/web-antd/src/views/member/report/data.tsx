@@ -5,6 +5,7 @@ import type { VxeGridProps } from '#/adapter/vxe-table';
 import { getPopupContainer } from '@vben/utils';
 
 const levelOptions = [
+  { label: 'VIP0', value: '0' },
   { label: 'VIP1', value: '1' },
   { label: 'VIP2', value: '2' },
   { label: 'VIP3', value: '3' },
@@ -47,7 +48,7 @@ export const querySchema: FormSchemaGetter = () => [
 
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
-  { field: 'userName', title: '用户名', minWidth: 120 },
+  { field: 'username', title: '用户名', minWidth: 120 },
   {
     field: 'realName',
     title: '真实姓名',
@@ -58,7 +59,7 @@ export const columns: VxeGridProps['columns'] = [
   },
   { field: 'level', title: '等级', minWidth: 80 },
   {
-    field: 'balance',
+    field: 'amount',
     title: '账户余额',
     minWidth: 110,
     formatter({ cellValue }) {
@@ -66,7 +67,7 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'totalRecharge',
+    field: 'rechargeAmount',
     title: '总充值',
     minWidth: 100,
     formatter({ cellValue }) {
@@ -74,7 +75,7 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'totalWithdraw',
+    field: 'withdrawAmount',
     title: '总提现',
     minWidth: 100,
     formatter({ cellValue }) {
@@ -98,12 +99,15 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'parentInfo',
+    field: 'parentUser',
     title: '上级信息',
     minWidth: 120,
     showOverflow: 'tooltip',
     formatter({ cellValue }) {
-      return cellValue || '-';
+      if (!cellValue) {
+        return '-';
+      }
+      return cellValue.username || '-';
     },
   },
   {
@@ -111,12 +115,12 @@ export const columns: VxeGridProps['columns'] = [
     title: '团队人数',
     minWidth: 90,
     formatter({ cellValue }) {
-      return cellValue ?? '0';
+      return cellValue ?? 0;
     },
   },
-  { field: 'createTime', title: '创建时间', minWidth: 160 },
+  { field: 'registerTime', title: '创建时间', minWidth: 160 },
   {
-    field: 'lastLoginTime',
+    field: 'lastLogin',
     title: '最后登录时间',
     minWidth: 160,
     formatter({ cellValue }) {
@@ -139,4 +143,46 @@ export const columns: VxeGridProps['columns'] = [
     resizable: false,
     width: 'auto',
   },
+];
+
+/** 流水明细表格列 */
+export const flowColumns: VxeGridProps['columns'] = [
+  { field: 'flowType', title: '流水类型', minWidth: 120 },
+  {
+    field: 'flowAmount',
+    title: '变动金额',
+    minWidth: 100,
+    formatter({ cellValue }) {
+      return cellValue ?? '0.00';
+    },
+  },
+  {
+    field: 'beforeAmount',
+    title: '变动前',
+    minWidth: 100,
+    formatter({ cellValue }) {
+      return cellValue ?? '0.00';
+    },
+  },
+  {
+    field: 'afterAmount',
+    title: '变动后',
+    minWidth: 100,
+    formatter({ cellValue }) {
+      return cellValue ?? '0.00';
+    },
+  },
+  { field: 'accountType', title: '账户类型', minWidth: 90 },
+  { field: 'currency', title: '币种', minWidth: 80 },
+  { field: 'status', title: '状态', minWidth: 90 },
+  {
+    field: 'remark',
+    title: '备注',
+    minWidth: 140,
+    showOverflow: 'tooltip',
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  { field: 'createdAt', title: '时间', minWidth: 160 },
 ];

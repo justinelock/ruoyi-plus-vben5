@@ -5,22 +5,19 @@ import { getPopupContainer } from '@vben/utils';
 
 import { Image, Space, Tag } from 'antdv-next';
 
-/** 认证状态筛选项（业务字典未接入前使用固定选项） */
+/** 认证状态筛选项 */
 export const authStatusOptions = [
-  { label: '未认证', value: '0' },
-  { label: '已认证', value: '1' },
-  { label: '认证中', value: '2' },
-  { label: '已拒绝', value: '3' },
+  { label: '未认证', value: 'UNVERIFIED' },
+  { label: '已认证', value: 'VERIFIED' },
+  { label: '认证中', value: 'PENDING' },
+  { label: '已拒绝', value: 'REJECTED' },
 ];
 
-const authStatusTagMap: Record<
-  string,
-  { color: string; label: string }
-> = {
-  '0': { color: 'default', label: '未认证' },
-  '1': { color: 'success', label: '已认证' },
-  '2': { color: 'processing', label: '认证中' },
-  '3': { color: 'error', label: '已拒绝' },
+const authStatusTagMap: Record<string, { color: string; label: string }> = {
+  UNVERIFIED: { color: 'default', label: '未认证' },
+  VERIFIED: { color: 'success', label: '已认证' },
+  PENDING: { color: 'processing', label: '认证中' },
+  REJECTED: { color: 'error', label: '已拒绝' },
 };
 
 function renderAuthStatus(status?: string) {
@@ -66,11 +63,7 @@ export const querySchema: FormSchemaGetter = () => [
 
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
-  {
-    field: 'userName',
-    title: '用户名',
-    minWidth: 120,
-  },
+  { field: 'username', title: '用户名', minWidth: 120 },
   {
     field: 'realName',
     title: '真实姓名',
@@ -80,7 +73,7 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'phoneNumber',
+    field: 'mobile',
     title: '手机号',
     minWidth: 120,
     formatter({ cellValue }) {
@@ -122,11 +115,11 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'authStatus',
+    field: 'status',
     title: '认证状态',
     minWidth: 100,
     slots: {
-      default: ({ row }) => renderAuthStatus(row.authStatus),
+      default: ({ row }) => renderAuthStatus(row.status),
     },
   },
   {
@@ -139,7 +132,7 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'submitTime',
+    field: 'createdAt',
     title: '提交时间',
     minWidth: 160,
     formatter({ cellValue }) {
@@ -147,7 +140,7 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'authTime',
+    field: 'verifiedAt',
     title: '认证时间',
     minWidth: 160,
     formatter({ cellValue }) {

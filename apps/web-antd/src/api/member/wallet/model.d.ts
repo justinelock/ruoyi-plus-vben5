@@ -1,18 +1,19 @@
+/** 用户钱包列表行（对齐 MemberWalletItem） */
 export interface MemberWallet {
   id: string;
-  userName: string;
-  phoneNumber: string;
+  userId: string;
+  username: string;
+  mobile: string;
   realName: string;
   accountType: string;
-  balance: string;
-  frozenAmount: string;
-  /** 1 冻结 / 0 正常 */
-  frozen: string;
+  balance: number;
+  frozenAmount: number;
+  frozen: boolean;
   version: string;
   currency: string;
-  lotteryCount: string;
-  createTime: string;
-  updateTime: string;
+  drawTicket: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface MemberWalletQuery {

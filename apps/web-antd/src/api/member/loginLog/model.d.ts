@@ -1,11 +1,14 @@
+/** 登录记录列表行（对齐 MemberLoginLogItem） */
 export interface MemberLoginLog {
   id: string;
-  userName: string;
+  userId: string;
+  username: string;
+  realName: string;
   deviceId: string;
   loginTime: string;
   loginIp: string;
   loginLocation: string;
-  loginMethod: string;
+  loginType: string;
   loginResult: string;
   failReason: string;
   riskLevel: string;

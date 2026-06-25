@@ -4,6 +4,7 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { MemberReport } from '#/api/member/report/model';
 
+import { useVbenDrawer } from '@vben/common-ui';
 import { Page } from '@vben/common-ui';
 
 import { Space } from 'antdv-next';
@@ -11,9 +12,9 @@ import { Space } from 'antdv-next';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { memberReportList } from '#/api/member/report';
 
+import ReportFlowDrawer from './report-flow-drawer.vue';
 import { columns, querySchema } from './data';
 
-// 1. 单行 inline 筛选 + createTime 时间范围映射（对接 GET /member/report/list）
 const formOptions: VbenFormProps = {
   schema: querySchema(),
   layout: 'inline',
@@ -34,7 +35,6 @@ const formOptions: VbenFormProps = {
   ],
 };
 
-// 2. 分页表格
 const gridOptions: VxeGridProps = {
   checkboxConfig: { highlight: true, reserve: true, trigger: 'default' },
   columns,
@@ -59,7 +59,20 @@ const gridOptions: VxeGridProps = {
 
 const [BasicTable] = useVbenVxeGrid({ formOptions, gridOptions });
 
-function handleView(_row: MemberReport) {}
+const [FlowDrawer, flowDrawerApi] = useVbenDrawer({
+  connectedComponent: ReportFlowDrawer,
+  destroyOnClose: true,
+});
+
+/** 打开流水抽屉：按 userId 分页拉取 fb_account_flow_records */
+function handleViewFlow(row: MemberReport) {
+  flowDrawerApi.setData({
+    userId: row.userId,
+    realName: row.realName || row.username,
+  });
+  flowDrawerApi.open();
+}
+
 function handleExport() {}
 </script>
 
@@ -79,12 +92,13 @@ function handleExport() {}
         <Space>
           <action-button
             v-access:code="['member:report:list']"
-            @click.stop="handleView(row)"
+            @click.stop="handleViewFlow(row)"
           >
-            详情
+            查看流水
           </action-button>
         </Space>
       </template>
     </BasicTable>
+    <FlowDrawer />
   </Page>
 </template>

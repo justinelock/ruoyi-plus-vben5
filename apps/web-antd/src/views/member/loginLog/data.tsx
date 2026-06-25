@@ -7,20 +7,20 @@ import { getPopupContainer } from '@vben/utils';
 import { Tag } from 'antdv-next';
 
 const loginResultOptions = [
-  { label: '成功', value: '0' },
-  { label: '失败', value: '1' },
+  { label: '成功', value: 'SUCCESS' },
+  { label: '失败', value: 'FAIL' },
 ];
 
 const loginMethodOptions = [
-  { label: '密码登录', value: 'password' },
-  { label: '短信登录', value: 'sms' },
-  { label: '第三方登录', value: 'oauth' },
+  { label: '密码登录', value: 'PASSWORD' },
+  { label: '短信登录', value: 'SMS' },
+  { label: '第三方登录', value: 'OAUTH' },
 ];
 
 const riskLevelOptions = [
-  { label: '低', value: 'low' },
-  { label: '中', value: 'medium' },
-  { label: '高', value: 'high' },
+  { label: '低', value: 'LOW' },
+  { label: '中', value: 'MEDIUM' },
+  { label: '高', value: 'HIGH' },
 ];
 
 const ipTypeOptions = [
@@ -95,13 +95,21 @@ export const querySchema: FormSchemaGetter = () => [
 ];
 
 const riskColorMap: Record<string, string> = {
-  low: 'success',
-  medium: 'warning',
-  high: 'error',
+  LOW: 'success',
+  MEDIUM: 'warning',
+  HIGH: 'error',
 };
 
 export const columns: VxeGridProps['columns'] = [
-  { field: 'userName', title: '用户名', minWidth: 120 },
+  { field: 'username', title: '用户名', minWidth: 120 },
+  {
+    field: 'realName',
+    title: '真实姓名',
+    minWidth: 100,
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
   {
     field: 'deviceId',
     title: '设备唯一标识',
@@ -121,15 +129,15 @@ export const columns: VxeGridProps['columns'] = [
       return cellValue || '-';
     },
   },
-  { field: 'loginMethod', title: '登录方式', minWidth: 100 },
+  { field: 'loginType', title: '登录方式', minWidth: 100 },
   {
     field: 'loginResult',
     title: '登录结果',
     minWidth: 90,
     slots: {
       default: ({ row }) => (
-        <Tag color={row.loginResult === '0' ? 'success' : 'error'}>
-          {row.loginResult === '0' ? '成功' : '失败'}
+        <Tag color={row.loginResult === 'SUCCESS' ? 'success' : 'error'}>
+          {row.loginResult === 'SUCCESS' ? '成功' : '失败'}
         </Tag>
       ),
     },

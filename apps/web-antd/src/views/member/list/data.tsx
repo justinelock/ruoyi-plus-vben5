@@ -6,7 +6,6 @@ import { getPopupContainer } from '@vben/utils';
 
 import { Tag } from 'antdv-next';
 
-import { getDictOptions } from '#/utils/dict';
 import { renderDict } from '#/utils/render';
 
 /** 认证状态筛选项（业务字典未接入前使用固定选项） */
@@ -16,17 +15,10 @@ const authStatusOptions = [
   { label: '认证中', value: '2' },
 ];
 
-/** 在线状态筛选项（表格展示用） */
-const onlineStatusOptions = [
-  { label: '在线', value: '1' },
-  { label: '离线', value: '0' },
-];
-
 export const querySchema: FormSchemaGetter = () => [
   {
     component: 'Input',
     fieldName: 'keyword',
-    // 单行检索：用户名 / 手机号 / 用户 ID 共用
     componentProps: {
       placeholder: '用户名/手机号/用户ID',
       class: 'w-[220px]',
@@ -59,7 +51,7 @@ export const querySchema: FormSchemaGetter = () => [
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
   {
-    field: 'userName',
+    field: 'username',
     title: '用户名',
     minWidth: 120,
   },
@@ -72,13 +64,13 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'investPosition',
+    field: 'fundPositionAmount',
     title: '投信持仓/分红',
     minWidth: 140,
     slots: {
       default: ({ row }) => {
-        const position = row.investPosition ?? '0';
-        const dividend = row.investDividend ?? '0';
+        const position = row.fundPositionAmount ?? 0;
+        const dividend = row.fundPositionDividend ?? 0;
         return `${position}/${dividend}`;
       },
     },
@@ -97,7 +89,7 @@ export const columns: VxeGridProps['columns'] = [
     minWidth: 100,
     slots: {
       default: ({ row }) => {
-        const online = row.onlineStatus === '1';
+        const online = row.onlineStatus === 1;
         return (
           <Tag color={online ? 'success' : 'default'}>
             {online ? '在线' : '离线'}
@@ -123,12 +115,12 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'createTime',
+    field: 'createdAt',
     title: '创建时间',
     minWidth: 160,
   },
   {
-    field: 'lastLoginTime',
+    field: 'lastLogin',
     title: '最后登录时间',
     minWidth: 160,
     formatter({ cellValue }) {
@@ -150,5 +142,4 @@ export const columns: VxeGridProps['columns'] = [
   },
 ];
 
-// 供后续认证状态列展示复用
-export { authStatusOptions, onlineStatusOptions };
+export { authStatusOptions };
