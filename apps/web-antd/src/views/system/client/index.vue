@@ -173,7 +173,7 @@ async function handleChangeStatus(
         />
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['system:client:edit']"
             @click.stop="handleEdit(row)"
@@ -195,7 +195,7 @@ async function handleChangeStatus(
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <ClientDrawer @reload="tableApi.query()" />

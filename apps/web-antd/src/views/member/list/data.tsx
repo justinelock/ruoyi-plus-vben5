@@ -53,6 +53,11 @@ type ColumnHandlers = {
   onOpenWallet: (row: MemberUser) => void;
 };
 
+type ColumnOptions = {
+  /** 已删用户抽屉：用户状态列展示「已删除」 */
+  deletedList?: boolean;
+};
+
 function stopRowClick(e: Event) {
   e.stopPropagation();
 }
@@ -134,8 +139,11 @@ function formatAmount(value?: number) {
   return Number(value).toFixed(2);
 }
 
-/** fb_users.status：ACTIVE 为正常 */
-function renderMemberStatus(status?: string) {
+/** fb_users.status：ACTIVE 为正常；已删列表固定展示「已删除」 */
+function renderMemberStatus(status?: string, deletedList?: boolean) {
+  if (deletedList) {
+    return <Tag color="error">已删除</Tag>;
+  }
   if (status === 'ACTIVE') {
     return <Tag color="success">正常</Tag>;
   }
@@ -145,7 +153,11 @@ function renderMemberStatus(status?: string) {
   return <Tag>{status || '-'}</Tag>;
 }
 
-export function createColumns(handlers: ColumnHandlers): VxeGridProps['columns'] {
+export function createColumns(
+  handlers: ColumnHandlers,
+  options?: ColumnOptions,
+): VxeGridProps['columns'] {
+  const deletedList = options?.deletedList ?? false;
   return [
     { type: 'checkbox', width: 60 },
     {
@@ -265,7 +277,7 @@ export function createColumns(handlers: ColumnHandlers): VxeGridProps['columns']
       title: '用户状态',
       minWidth: 100,
       slots: {
-        default: ({ row }) => renderMemberStatus(row.status),
+        default: ({ row }) => renderMemberStatus(row.status, deletedList),
       },
     },
     {

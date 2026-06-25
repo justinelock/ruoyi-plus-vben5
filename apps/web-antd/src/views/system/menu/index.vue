@@ -220,7 +220,7 @@ const isAdmin = computed(() => {
         </Space>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['system:menu:edit']"
             v-access:role="['superadmin']"
@@ -253,7 +253,7 @@ const isAdmin = computed(() => {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <MenuDrawer @reload="afterEditOrAdd" />

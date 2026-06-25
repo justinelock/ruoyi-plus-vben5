@@ -6,7 +6,7 @@ import { ref } from 'vue';
 
 import { useVbenDrawer, useVbenModal } from '@vben/common-ui';
 
-import { Space, Table } from 'antdv-next';
+import { Table } from 'antdv-next';
 
 import { memberWalletList } from '#/api/member/wallet';
 
@@ -121,7 +121,7 @@ const [BasicDrawer, drawerApi] = useVbenDrawer({
           {{ record.drawTicket ?? 0 }}
         </template>
         <template v-else-if="column.key === 'action'">
-          <Space class="py-2" :size="4" wrap>
+          <table-action-space class="py-2" wrap>
             <a-button
               size="small"
               type="link"
@@ -157,7 +157,7 @@ const [BasicDrawer, drawerApi] = useVbenDrawer({
             >
               划转
             </a-button>
-          </Space>
+          </table-action-space>
         </template>
       </template>
     </Table>

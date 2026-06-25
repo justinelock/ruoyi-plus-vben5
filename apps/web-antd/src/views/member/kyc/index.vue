@@ -109,7 +109,7 @@ function handleExport() {
         </a-button>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['member:kyc:list']"
             @click.stop="handleView(row)"
@@ -123,7 +123,7 @@ function handleExport() {
           >
             审核
           </action-button>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
   </Page>

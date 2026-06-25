@@ -60,6 +60,15 @@ export function memberUserRemove(ids: IDS) {
 }
 
 /**
+ * 恢复已删业务用户（flag=0）
+ * @see PUT /member/user/restore/{ids}
+ */
+export function memberUserRestore(ids: IDS) {
+  const idStr = Array.isArray(ids) ? ids.join(',') : ids;
+  return alovaInstance.putWithMsg<void>(`${Api.root}/restore/${idStr}`);
+}
+
+/**
  * 重置业务用户密码（默认登录密码 type=1）
  */
 export function memberUserResetPassword(data: MemberUserResetPwdParam) {

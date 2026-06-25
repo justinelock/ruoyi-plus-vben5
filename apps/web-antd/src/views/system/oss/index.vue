@@ -288,7 +288,7 @@ const [UploadTestModal, uploadTestApi] = useVbenModal({
         <span v-else>{{ row.url }}</span>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['system:oss:download']"
             @click="handleDownload(row)"
@@ -308,7 +308,7 @@ const [UploadTestModal, uploadTestApi] = useVbenModal({
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <ImageUploadModal @reload="tableApi.query" />

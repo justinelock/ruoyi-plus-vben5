@@ -89,14 +89,14 @@ function handleExport() {}
         </a-button>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['member:report:list']"
             @click.stop="handleViewFlow(row)"
           >
             查看流水
           </action-button>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <FlowDrawer />

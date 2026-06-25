@@ -184,7 +184,7 @@ async function handleExport() {
         </Space>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button @click.stop="handlePreview(row)">
             {{ $t('pages.common.info') }}
           </action-button>
@@ -201,7 +201,7 @@ async function handleExport() {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <LoginInfoModal />

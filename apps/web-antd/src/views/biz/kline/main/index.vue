@@ -63,14 +63,14 @@ function handleExport() {}
         </a-button>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['kline:main:list']"
             @click.stop="handleView(row)"
           >
             详情
           </action-button>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
   </Page>

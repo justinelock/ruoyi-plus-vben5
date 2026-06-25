@@ -70,7 +70,7 @@ function handleExport() {}
         </a-button>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['member:wallet:list']"
             @click.stop="handleView(row)"
@@ -83,7 +83,7 @@ function handleExport() {}
           >
             编辑
           </action-button>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
   </Page>

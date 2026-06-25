@@ -123,7 +123,7 @@ function handleMultiDelete() {
         </Space>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['system:demo:edit']"
             @click.stop="handleEdit(row)"
@@ -144,7 +144,7 @@ function handleMultiDelete() {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <DemoModal @reload="tableApi.query()" />

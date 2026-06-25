@@ -208,7 +208,7 @@ async function handleChangeStatus(checked: SwitchProps['checked'], row: Role) {
             !row.superAdmin && (row.roleKey !== ADMIN_ROLE_KEY || isSuperAdmin)
           "
         >
-          <Space>
+          <table-action-space>
             <action-button
               v-access:code="['system:role:edit']"
               @click.stop="handleEdit(row)"
@@ -240,7 +240,7 @@ async function handleChangeStatus(checked: SwitchProps['checked'], row: Role) {
                 {{ $t('pages.common.delete') }}
               </action-button>
             </Popconfirm>
-          </Space>
+          </table-action-space>
         </template>
       </template>
     </BasicTable>

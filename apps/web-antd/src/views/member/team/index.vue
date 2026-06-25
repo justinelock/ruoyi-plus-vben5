@@ -124,14 +124,14 @@ function handleExport() {
       </div>
       <BasicTable class="min-h-0 flex-1 overflow-hidden" table-title="团队管理">
         <template #action="{ row }">
-          <Space>
+          <table-action-space>
             <action-button
               v-access:code="['member:team:list']"
               @click.stop="handleView(row)"
             >
               详情
             </action-button>
-          </Space>
+          </table-action-space>
         </template>
       </BasicTable>
     </div>

@@ -250,7 +250,7 @@ const handleMenuClick: DropdownEmits['menuClick'] = (e) => {
         />
       </template>
       <template #action="{ row }">
-        <Space v-if="row.id !== 1">
+        <table-action-space v-if="row.id !== 1">
           <action-button
             v-access:code="['system:tenant:edit']"
             @click="handleEdit(row)"
@@ -283,7 +283,7 @@ const handleMenuClick: DropdownEmits['menuClick'] = (e) => {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <TenantDrawer @reload="tableApi.query()" />

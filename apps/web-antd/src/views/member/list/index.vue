@@ -12,7 +12,7 @@ import { useAccess } from '@vben/access';
 import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
 import { $t } from '@vben/locales';
 
-import { Dropdown, Popconfirm, Space, Tag } from 'antdv-next';
+import { Dropdown, Popconfirm, Tag } from 'antdv-next';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
@@ -22,12 +22,10 @@ import {
 } from '#/api/member/user';
 
 import { createColumns, querySchema } from './data';
+import deletedUsersDrawer from './deleted-users-drawer.vue';
 import userEditDrawer from './user-edit-drawer.vue';
 import userResetPwdModal from './user-reset-pwd-modal.vue';
 import UserWalletDrawer from './user-wallet-drawer.vue';
-
-/** 是否查看已删用户（切换后重新查询） */
-const showDeleted = ref(false);
 
 /** 标题 Tag：近 5 分钟全局活跃用户数 */
 const totalActiveSessions = ref(0);
@@ -97,7 +95,7 @@ const gridOptions: VxeGridProps = {
         const params = {
           pageNum: page.currentPage,
           pageSize: page.pageSize,
-          deleted: showDeleted.value ? '1' : '0',
+          deleted: '0',
           ...formValues,
         };
         const [listResp] = await Promise.all([
@@ -130,6 +128,11 @@ const [UserEditDrawer, userEditDrawerApi] = useVbenDrawer({
   destroyOnClose: true,
 });
 
+const [DeletedUsersDrawer, deletedUsersDrawerApi] = useVbenDrawer({
+  connectedComponent: deletedUsersDrawer,
+  destroyOnClose: true,
+});
+
 const [UserResetPwdModal, userResetPwdModalApi] = useVbenModal({
   connectedComponent: userResetPwdModal,
 });
@@ -153,9 +156,10 @@ function handleExport() {
   // 导出待业务接口就绪后接入
 }
 
-function handleToggleDeleted() {
-  showDeleted.value = !showDeleted.value;
-  tableApi.reload();
+async function handleOpenDeleted() {
+  const query = await tableApi.formApi.getValues();
+  deletedUsersDrawerApi.setData({ query });
+  deletedUsersDrawerApi.open();
 }
 
 const { hasAccessByCodes } = useAccess();
@@ -193,14 +197,13 @@ function handleMenuClick(key: string, row: MemberUser) {
         </a-button>
         <a-button
           v-access:code="['member:list:list']"
-          :type="showDeleted ? 'primary' : 'default'"
-          @click="handleToggleDeleted"
+          @click="handleOpenDeleted"
         >
           已删用户
         </a-button>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['member:list:list']"
             @click.stop="handleEdit(row)"
@@ -220,7 +223,7 @@ function handleMenuClick(key: string, row: MemberUser) {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        
         <Dropdown
           placement="bottomRight"
           :menu="{
@@ -232,10 +235,12 @@ function handleMenuClick(key: string, row: MemberUser) {
             {{ $t('pages.common.more') }}
           </a-button>
         </Dropdown>
+        </table-action-space>
       </template>
     </BasicTable>
     <WalletDrawer />
     <UserEditDrawer @reload="tableApi.query()" />
+    <DeletedUsersDrawer @reload="tableApi.query()" />
     <UserResetPwdModal @reload="tableApi.query()" />
   </Page>
 </template>
