@@ -6,7 +6,7 @@ import type { MemberUser } from '#/api/member/user/model';
 
 import { ref } from 'vue';
 
-import { Page } from '@vben/common-ui';
+import { Page, useVbenDrawer } from '@vben/common-ui';
 import { $t } from '@vben/locales';
 
 import { Space, Tag } from 'antdv-next';
@@ -14,7 +14,8 @@ import { Space, Tag } from 'antdv-next';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { memberUserList, memberUserStats } from '#/api/member/user';
 
-import { columns, querySchema } from './data';
+import { createColumns, querySchema } from './data';
+import UserWalletDrawer from './user-wallet-drawer.vue';
 
 /** 是否查看已删用户（切换后重新查询） */
 const showDeleted = ref(false);
@@ -59,13 +60,28 @@ const formOptions: VbenFormProps = {
   ],
 };
 
+const [WalletDrawer, walletDrawerApi] = useVbenDrawer({
+  connectedComponent: UserWalletDrawer,
+  destroyOnClose: true,
+});
+
+/** 右侧抽屉：按 userId 拉取钱包列表 */
+function handleOpenWallet(row: MemberUser) {
+  walletDrawerApi.setData({
+    userId: row.id,
+    username: row.username,
+    realName: row.realName,
+  });
+  walletDrawerApi.open();
+}
+
 const gridOptions: VxeGridProps = {
   checkboxConfig: {
     highlight: true,
     reserve: true,
     trigger: 'default',
   },
-  columns,
+  columns: createColumns({ onOpenWallet: handleOpenWallet }),
   height: 'auto',
   keepSource: true,
   pagerConfig: {},
@@ -165,5 +181,6 @@ function handleToggleDeleted() {
         </Space>
       </template>
     </BasicTable>
+    <WalletDrawer />
   </Page>
 </template>

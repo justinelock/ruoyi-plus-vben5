@@ -1,12 +1,13 @@
+import type { MemberUser } from '#/api/member/user/model';
+
 import type { FormSchemaGetter } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
-import { DictEnum } from '@vben/constants';
 import { getPopupContainer } from '@vben/utils';
 
-import { Tag } from 'antdv-next';
+import { Tag, Tooltip } from 'antdv-next';
 
-import { renderDict } from '#/utils/render';
+import { copyText } from './copy-text';
 
 /** 认证状态筛选项（业务字典未接入前使用固定选项） */
 const authStatusOptions = [
@@ -48,98 +49,263 @@ export const querySchema: FormSchemaGetter = () => [
   },
 ];
 
-export const columns: VxeGridProps['columns'] = [
-  { type: 'checkbox', width: 60 },
-  {
-    field: 'username',
-    title: '用户名',
-    minWidth: 120,
-  },
-  {
-    field: 'totalBalance',
-    title: '账户总余额',
-    minWidth: 120,
-    formatter({ cellValue }) {
-      return cellValue ?? '0.00';
-    },
-  },
-  {
-    field: 'fundPositionAmount',
-    title: '投信持仓/分红',
-    minWidth: 140,
-    slots: {
-      default: ({ row }) => {
-        const position = row.fundPositionAmount ?? 0;
-        const dividend = row.fundPositionDividend ?? 0;
-        return `${position}/${dividend}`;
+type ColumnHandlers = {
+  onOpenWallet: (row: MemberUser) => void;
+};
+
+function stopRowClick(e: Event) {
+  e.stopPropagation();
+}
+
+/** fluent:copy-16-filled（UnoCSS iconify） */
+function CopyIcon({ onClick }: { onClick: (e: MouseEvent) => void }) {
+  return (
+    <span
+      class="size-14px icon-[fluent--copy-16-filled] inline-block shrink-0 cursor-pointer text-primary hover:opacity-80"
+      onClick={onClick}
+    />
+  );
+}
+
+/** fluent:wallet-16-filled */
+function WalletIcon({
+  disabled,
+  onClick,
+}: {
+  disabled?: boolean;
+  onClick?: (e: MouseEvent) => void;
+}) {
+  return (
+    <span
+      class={
+        disabled
+          ? 'size-14px icon-[fluent--wallet-16-filled] inline-block shrink-0 text-muted-foreground opacity-40'
+          : 'size-14px icon-[fluent--wallet-16-filled] inline-block shrink-0 cursor-pointer text-primary hover:opacity-80'
+      }
+      onClick={onClick}
+    />
+  );
+}
+
+/** fluent:contact-card-16-filled */
+function IdCardIcon({
+  disabled,
+  onClick,
+}: {
+  disabled?: boolean;
+  onClick?: (e: MouseEvent) => void;
+}) {
+  return (
+    <span
+      class={
+        disabled
+          ? 'size-14px icon-[fluent--contact-card-16-filled] inline-block shrink-0 text-muted-foreground opacity-40'
+          : 'size-14px icon-[fluent--contact-card-16-filled] inline-block shrink-0 cursor-pointer text-primary hover:opacity-80'
+      }
+      onClick={onClick}
+    />
+  );
+}
+
+/** 值 + 复制图标 */
+function renderCopyableValue(value?: null | number | string) {
+  const text = value === null || value === undefined || value === '' ? '-' : String(value);
+  return (
+    <span class="inline-flex items-center gap-1">
+      <span>{text}</span>
+      {text !== '-' ? (
+        <Tooltip title="复制">
+          <CopyIcon
+            onClick={(e) => {
+              stopRowClick(e);
+              copyText(text);
+            }}
+          />
+        </Tooltip>
+      ) : null}
+    </span>
+  );
+}
+
+function formatAmount(value?: number) {
+  if (value === null || value === undefined) {
+    return '0.00';
+  }
+  return Number(value).toFixed(2);
+}
+
+/** fb_users.status：ACTIVE 为正常 */
+function renderMemberStatus(status?: string) {
+  if (status === 'ACTIVE') {
+    return <Tag color="success">正常</Tag>;
+  }
+  if (status === 'DISABLED' || status === 'INACTIVE') {
+    return <Tag color="error">停用</Tag>;
+  }
+  return <Tag>{status || '-'}</Tag>;
+}
+
+export function createColumns(handlers: ColumnHandlers): VxeGridProps['columns'] {
+  return [
+    { type: 'checkbox', width: 60 },
+    {
+      field: 'username',
+      title: '用户名',
+      minWidth: 140,
+      slots: {
+        default: ({ row }) => renderCopyableValue(row.username),
       },
     },
-  },
-  {
-    field: 'realName',
-    title: '真实姓名',
-    minWidth: 100,
-    formatter({ cellValue }) {
-      return cellValue || '-';
-    },
-  },
-  {
-    field: 'onlineStatus',
-    title: '在线状态',
-    minWidth: 100,
-    slots: {
-      default: ({ row }) => {
-        const online = row.onlineStatus === 1;
-        return (
-          <Tag color={online ? 'success' : 'default'}>
-            {online ? '在线' : '离线'}
-          </Tag>
-        );
+    {
+      field: 'totalBalance',
+      title: '账户总余额',
+      minWidth: 140,
+      slots: {
+        default: ({ row }) => {
+          const balance = formatAmount(row.totalBalance);
+          const openWallet = (e: Event) => {
+            stopRowClick(e);
+            handlers.onOpenWallet(row as MemberUser);
+          };
+          return (
+            <span class="inline-flex items-center gap-1">
+              <span
+                class="cursor-pointer text-primary underline decoration-primary/60 underline-offset-2 hover:opacity-80"
+                onClick={openWallet}
+              >
+                {balance}
+              </span>
+              <Tooltip title="查看钱包">
+                <WalletIcon onClick={openWallet} />
+              </Tooltip>
+            </span>
+          );
+        },
       },
     },
-  },
-  {
-    field: 'status',
-    title: '用户状态',
-    minWidth: 100,
-    slots: {
-      default: ({ row }) => renderDict(row.status, DictEnum.SYS_NORMAL_DISABLE),
+    {
+      field: 'fundPositionAmount',
+      title: '投信持仓/分红',
+      minWidth: 150,
+      slots: {
+        default: ({ row }) => {
+          const position = Number(row.fundPositionAmount ?? 0);
+          const dividend = Number(row.fundPositionDividend ?? 0);
+          return (
+            <span>
+              <span class={position > 0 ? 'font-bold text-[#1677ff]' : ''}>
+                {position}
+              </span>
+              <span>/</span>
+              <span class={dividend > 0 ? 'font-bold text-[#ff4d4f]' : ''}>
+                {dividend}
+              </span>
+            </span>
+          );
+        },
+      },
     },
-  },
-  {
-    field: 'inviteCode',
-    title: '邀请码',
-    minWidth: 100,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    {
+      field: 'realName',
+      title: '真实姓名',
+      minWidth: 140,
+      slots: {
+        default: ({ row }) => {
+          const name = row.realName || '-';
+          const idCard = row.idCard?.trim();
+          return (
+            <span class="inline-flex items-center gap-1">
+              <span>{name}</span>
+              {name !== '-' ? (
+                <Tooltip title="复制姓名">
+                  <CopyIcon
+                    onClick={(e) => {
+                      stopRowClick(e);
+                      copyText(name);
+                    }}
+                  />
+                </Tooltip>
+              ) : null}
+              {idCard ? (
+                <Tooltip title={`证件号：${idCard}（点击复制）`}>
+                  <IdCardIcon
+                    onClick={(e) => {
+                      stopRowClick(e);
+                      copyText(idCard);
+                    }}
+                  />
+                </Tooltip>
+              ) : (
+                <Tooltip title="无证件号">
+                  <IdCardIcon disabled />
+                </Tooltip>
+              )}
+            </span>
+          );
+        },
+      },
     },
-  },
-  {
-    field: 'createdAt',
-    title: '创建时间',
-    minWidth: 160,
-  },
-  {
-    field: 'lastLogin',
-    title: '最后登录时间',
-    minWidth: 160,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    {
+      field: 'onlineStatus',
+      title: '在线状态',
+      minWidth: 100,
+      slots: {
+        default: ({ row }) => {
+          const online = row.onlineStatus === 1;
+          return (
+            <Tag color={online ? 'success' : 'default'}>
+              {online ? '在线' : '离线'}
+            </Tag>
+          );
+        },
+      },
     },
-  },
-  {
-    field: 'id',
-    title: 'ID',
-    minWidth: 180,
-  },
-  {
-    field: 'action',
-    fixed: 'right',
-    slots: { default: 'action' },
-    title: '操作',
-    resizable: false,
-    width: 'auto',
-  },
-];
+    {
+      field: 'status',
+      title: '用户状态',
+      minWidth: 100,
+      slots: {
+        default: ({ row }) => renderMemberStatus(row.status),
+      },
+    },
+    {
+      field: 'inviteCode',
+      title: '邀请码',
+      minWidth: 120,
+      slots: {
+        default: ({ row }) => renderCopyableValue(row.inviteCode),
+      },
+    },
+    {
+      field: 'createdAt',
+      title: '创建时间',
+      minWidth: 160,
+    },
+    {
+      field: 'lastLogin',
+      title: '最后登录时间',
+      minWidth: 160,
+      formatter({ cellValue }) {
+        return cellValue || '-';
+      },
+    },
+    {
+      field: 'id',
+      title: 'ID',
+      minWidth: 200,
+      slots: {
+        default: ({ row }) => renderCopyableValue(row.id),
+      },
+    },
+    {
+      field: 'action',
+      fixed: 'right',
+      slots: { default: 'action' },
+      title: '操作',
+      resizable: false,
+      width: 'auto',
+    },
+  ];
+}
 
 export { authStatusOptions };
