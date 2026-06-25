@@ -54,9 +54,11 @@ const inlineFormConfig: VbenFormProps = {
   ],
 };
 
-// 3. 按当前筛选条件刷新代理统计
+// 3. 按 keyword 刷新顶部统计卡片（stats 不用 status/时间，对齐 Java）
 async function loadStats(formValues: Record<string, any> = {}) {
-  teamStats.value = await memberTeamStats(formValues);
+  teamStats.value = await memberTeamStats({
+    keyword: formValues.keyword,
+  });
 }
 
 /** 取查询区当前值（含未点「查询」时输入框内容），供列表/统计刷新 */
