@@ -22,6 +22,7 @@ import {
 } from '#/api/member/user';
 
 import { createColumns, querySchema } from './data';
+import userEditDrawer from './user-edit-drawer.vue';
 import userResetPwdModal from './user-reset-pwd-modal.vue';
 import UserWalletDrawer from './user-wallet-drawer.vue';
 
@@ -124,12 +125,18 @@ const [BasicTable, tableApi] = useVbenVxeGrid({
   gridOptions,
 });
 
+const [UserEditDrawer, userEditDrawerApi] = useVbenDrawer({
+  connectedComponent: userEditDrawer,
+  destroyOnClose: true,
+});
+
 const [UserResetPwdModal, userResetPwdModalApi] = useVbenModal({
   connectedComponent: userResetPwdModal,
 });
 
-function handleEdit(_row: MemberUser) {
-  // 编辑抽屉待业务接口就绪后接入
+function handleEdit(row: MemberUser) {
+  userEditDrawerApi.setData({ id: row.id });
+  userEditDrawerApi.open();
 }
 
 async function handleDelete(row: MemberUser) {
@@ -228,6 +235,7 @@ function handleMenuClick(key: string, row: MemberUser) {
       </template>
     </BasicTable>
     <WalletDrawer />
+    <UserEditDrawer @reload="tableApi.query()" />
     <UserResetPwdModal @reload="tableApi.query()" />
   </Page>
 </template>

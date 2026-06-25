@@ -1,4 +1,11 @@
-import type { MemberUser, MemberUserResetPwdParam, MemberUserQuery, MemberUserStats } from './model';
+import type {
+  MemberUser,
+  MemberUserInfo,
+  MemberUserResetPwdParam,
+  MemberUserQuery,
+  MemberUserStats,
+  MemberUserUpdate,
+} from './model';
 
 import type { ID, IDS, PageResult } from '#/api/common';
 
@@ -25,6 +32,22 @@ export function memberUserList(params?: MemberUserQuery) {
  */
 export function memberUserStats() {
   return alovaInstance.get<MemberUserStats>(Api.stats);
+}
+
+/**
+ * 按 id 查询业务用户详情（编辑）
+ * @see GET /member/user/{id}
+ */
+export function memberUserInfo(id: ID) {
+  return alovaInstance.get<MemberUserInfo>(`${Api.root}/${id}`);
+}
+
+/**
+ * 保存业务用户编辑
+ * @see PUT /member/user
+ */
+export function memberUserUpdate(data: MemberUserUpdate) {
+  return alovaInstance.putWithMsg<void>(Api.root, data);
 }
 
 /**
