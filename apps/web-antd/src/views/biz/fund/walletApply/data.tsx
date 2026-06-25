@@ -10,19 +10,21 @@ import { renderCopyableValue } from '#/utils/render-copyable';
 
 const accountTypeOptions = [
   { label: '主账户', value: 'main' },
-  { label: '子账户', value: 'sub' },
+  { label: '投信账户', value: 'fund' },
+  { label: '外汇账户', value: 'forex' },
+  { label: '期货账户', value: 'future' },
 ];
 
 const statusOptions = [
-  { label: '待审核', value: '0' },
-  { label: '已通过', value: '1' },
-  { label: '已拒绝', value: '2' },
+  { label: '待审核', value: 'PENDING' },
+  { label: '已通过', value: 'APPROVED' },
+  { label: '已拒绝', value: 'REJECTED' },
 ];
 
 const statusTagMap: Record<string, { color: string; label: string }> = {
-  '0': { color: 'processing', label: '待审核' },
-  '1': { color: 'success', label: '已通过' },
-  '2': { color: 'error', label: '已拒绝' },
+  PENDING: { color: 'processing', label: '待审核' },
+  APPROVED: { color: 'success', label: '已通过' },
+  REJECTED: { color: 'error', label: '已拒绝' },
 };
 
 export const querySchema: FormSchemaGetter = () => [
@@ -30,7 +32,7 @@ export const querySchema: FormSchemaGetter = () => [
     component: 'Input',
     fieldName: 'keyword',
     componentProps: {
-      placeholder: '用户名/手机号/用户ID',
+      placeholder: '用户名/手机号/姓名',
       class: 'w-[220px]',
     },
     formItemClass: 'pb-0',
@@ -73,11 +75,11 @@ export const querySchema: FormSchemaGetter = () => [
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
   {
-    field: 'userName',
+    field: 'username',
     title: '用户名',
     minWidth: 140,
     slots: {
-      default: ({ row }) => renderCopyableValue(row.userName),
+      default: ({ row }) => renderCopyableValue(row.username),
     },
   },
   {
@@ -89,7 +91,7 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'phoneNumber',
+    field: 'mobile',
     title: '手机号',
     minWidth: 120,
     formatter({ cellValue }) {
@@ -112,7 +114,7 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'riskScore',
+    field: 'riskAssessmentScore',
     title: '风险评估分',
     minWidth: 100,
     formatter({ cellValue }) {
@@ -120,7 +122,7 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'auditOpinion',
+    field: 'rejectReason',
     title: '审核意见',
     minWidth: 140,
     showOverflow: 'tooltip',
@@ -138,7 +140,7 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'auditor',
+    field: 'auditUser',
     title: '审核人',
     minWidth: 100,
     formatter({ cellValue }) {
@@ -153,4 +155,75 @@ export const columns: VxeGridProps['columns'] = [
     resizable: false,
     width: 'auto',
   },
+];
+
+/** 最近流水抽屉列 */
+export const walletApplyFlowColumns: VxeGridProps['columns'] = [
+  {
+    field: 'flowType',
+    title: '交易类型',
+    minWidth: 120,
+  },
+  {
+    field: 'flowAmount',
+    title: '变动金额',
+    minWidth: 110,
+    formatter({ cellValue }) {
+      const num = Number(cellValue ?? 0);
+      return num.toFixed(2);
+    },
+  },
+  {
+    field: 'beforeAmount',
+    title: '交易前余额',
+    minWidth: 110,
+    formatter({ cellValue }) {
+      const num = Number(cellValue ?? 0);
+      return num.toFixed(2);
+    },
+  },
+  {
+    field: 'afterAmount',
+    title: '交易后余额',
+    minWidth: 110,
+    formatter({ cellValue }) {
+      const num = Number(cellValue ?? 0);
+      return num.toFixed(2);
+    },
+  },
+  { field: 'status', title: '交易状态', minWidth: 90 },
+  {
+    field: 'description',
+    title: '交易描述',
+    minWidth: 140,
+    showOverflow: 'tooltip',
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+];
+
+/** 登录记录抽屉列 */
+export const walletApplyLoginLogColumns: VxeGridProps['columns'] = [
+  { field: 'loginTime', title: '登录时间', minWidth: 160 },
+  { field: 'loginIp', title: '登录IP', minWidth: 130 },
+  {
+    field: 'loginLocation',
+    title: '登录地点',
+    minWidth: 100,
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  { field: 'loginType', title: '登录方式', minWidth: 100 },
+  { field: 'loginResult', title: '登录结果', minWidth: 90 },
+  {
+    field: 'failReason',
+    title: '失败原因',
+    minWidth: 120,
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  { field: 'riskLevel', title: '风险等级', minWidth: 90 },
 ];
