@@ -4,16 +4,19 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { FundWithdraw } from '#/api/biz/fund/withdraw/model';
 
-import { Page } from '@vben/common-ui';
+import { Page, useVbenModal } from '@vben/common-ui';
 
-import { Space } from 'antdv-next';
+import { Popconfirm } from 'antdv-next';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { fundWithdrawList } from '#/api/biz/fund/withdraw';
+import {
+  fundWithdrawApproved,
+  fundWithdrawList,
+} from '#/api/biz/fund/withdraw';
 
 import { columns, querySchema } from './data';
+import WithdrawRejectModal from './withdraw-reject-modal.vue';
 
-// 1. 单行 inline 筛选 + createTime 时间范围映射（对接 GET /fund/withdraw/list）
 const formOptions: VbenFormProps = {
   schema: querySchema(),
   layout: 'inline',
@@ -34,7 +37,6 @@ const formOptions: VbenFormProps = {
   ],
 };
 
-// 2. 分页表格
 const gridOptions: VxeGridProps = {
   checkboxConfig: { highlight: true, reserve: true, trigger: 'default' },
   columns,
@@ -57,10 +59,22 @@ const gridOptions: VxeGridProps = {
   id: 'fund-withdraw-index',
 };
 
-const [BasicTable] = useVbenVxeGrid({ formOptions, gridOptions });
+const [BasicTable, tableApi] = useVbenVxeGrid({ formOptions, gridOptions });
 
-function handleView(_row: FundWithdraw) {}
-function handleAudit(_row: FundWithdraw) {}
+const [RejectModal, rejectModalApi] = useVbenModal({
+  connectedComponent: WithdrawRejectModal,
+});
+
+async function handleApproved(row: FundWithdraw) {
+  await fundWithdrawApproved(row.id);
+  await tableApi.query();
+}
+
+function handleReject(row: FundWithdraw) {
+  rejectModalApi.setData(row);
+  rejectModalApi.open();
+}
+
 function handleExport() {}
 </script>
 
@@ -77,22 +91,29 @@ function handleExport() {}
         </a-button>
       </template>
       <template #action="{ row }">
-        <table-action-space>
+        <table-action-space v-if="row.status === 'PENDING'">
+          <Popconfirm
+            placement="left"
+            title="确认批准该提现申请？"
+            @confirm="handleApproved(row)"
+          >
+            <action-button
+              v-access:code="['fund:withdraw:list']"
+              @click.stop=""
+            >
+              批准
+            </action-button>
+          </Popconfirm>
           <action-button
             v-access:code="['fund:withdraw:list']"
-            @click.stop="handleView(row)"
+            danger
+            @click.stop="handleReject(row)"
           >
-            详情
-          </action-button>
-          <action-button
-            v-if="row.withdrawStatus === '0'"
-            v-access:code="['fund:withdraw:list']"
-            @click.stop="handleAudit(row)"
-          >
-            审核
+            拒绝
           </action-button>
         </table-action-space>
       </template>
     </BasicTable>
+    <RejectModal @reload="tableApi.query()" />
   </Page>
 </template>

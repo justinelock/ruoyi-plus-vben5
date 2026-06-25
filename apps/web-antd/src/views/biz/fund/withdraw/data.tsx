@@ -1,4 +1,4 @@
-/** 提现管理列表：筛选 schema 与表格列（字段对齐 FundWithdrawItem） */
+/** 提现管理列表：筛选 schema 与表格列（对齐 Java selectPageWithUser） */
 import type { FormSchemaGetter } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
@@ -8,23 +8,21 @@ import { Tag } from 'antdv-next';
 
 import { renderCopyableValue } from '#/utils/render-copyable';
 
-const withdrawStatusOptions = [
-  { label: '待审核', value: '0' },
-  { label: '处理中', value: '1' },
-  { label: '已完成', value: '2' },
-  { label: '已拒绝', value: '3' },
+const statusOptions = [
+  { label: '待审核', value: 'PENDING' },
+  { label: '已通过', value: 'SUCCESS' },
+  { label: '已拒绝', value: 'REJECTED' },
 ];
 
 const withdrawTypeOptions = [
-  { label: 'USDT', value: 'usdt' },
-  { label: '银行卡', value: 'bank' },
+  { label: 'USDT', value: 'USDT' },
+  { label: 'CNY', value: 'CNY' },
 ];
 
-const statusTagMap: Record<string, { color: string; label: string }> = {
-  '0': { color: 'processing', label: '待审核' },
-  '1': { color: 'warning', label: '处理中' },
-  '2': { color: 'success', label: '已完成' },
-  '3': { color: 'error', label: '已拒绝' },
+export const statusTagMap: Record<string, { color: string; label: string }> = {
+  PENDING: { color: 'processing', label: '待审核' },
+  SUCCESS: { color: 'success', label: '已通过' },
+  REJECTED: { color: 'error', label: '已拒绝' },
 };
 
 export const querySchema: FormSchemaGetter = () => [
@@ -32,7 +30,7 @@ export const querySchema: FormSchemaGetter = () => [
     component: 'Input',
     fieldName: 'keyword',
     componentProps: {
-      placeholder: '用户名/手机号/用户ID',
+      placeholder: '用户名/手机号/订单号',
       class: 'w-[220px]',
     },
     formItemClass: 'pb-0',
@@ -43,10 +41,10 @@ export const querySchema: FormSchemaGetter = () => [
       getPopupContainer,
       allowClear: true,
       class: 'w-[120px]',
-      options: withdrawStatusOptions,
-      placeholder: '提现状态',
+      options: statusOptions,
+      placeholder: '状态',
     },
-    fieldName: 'withdrawStatus',
+    fieldName: 'status',
     formItemClass: 'pb-0',
   },
   {
@@ -58,7 +56,7 @@ export const querySchema: FormSchemaGetter = () => [
       options: withdrawTypeOptions,
       placeholder: '提现类型',
     },
-    fieldName: 'withdrawType',
+    fieldName: 'type',
     formItemClass: 'pb-0',
   },
   {
@@ -75,11 +73,11 @@ export const querySchema: FormSchemaGetter = () => [
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
   {
-    field: 'userName',
+    field: 'username',
     title: '用户名',
     minWidth: 140,
     slots: {
-      default: ({ row }) => renderCopyableValue(row.userName),
+      default: ({ row }) => renderCopyableValue(row.username),
     },
   },
   {
@@ -91,16 +89,50 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'withdrawAmount',
-    title: '提现金额',
-    minWidth: 110,
+    field: 'mobile',
+    title: '手机号',
+    minWidth: 120,
     formatter({ cellValue }) {
-      return cellValue ?? '0.00';
+      return cellValue || '-';
     },
   },
   {
-    field: 'usdtAddress',
-    title: 'USDT地址',
+    field: 'orderNo',
+    title: '订单号',
+    minWidth: 200,
+    showOverflow: 'tooltip',
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  {
+    field: 'amount',
+    title: '提现金额',
+    minWidth: 110,
+    formatter({ cellValue }) {
+      const num = Number(cellValue ?? 0);
+      return num.toFixed(2);
+    },
+  },
+  {
+    field: 'withdrawType',
+    title: '提现类型',
+    minWidth: 100,
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  {
+    field: 'bankName',
+    title: '银行/链',
+    minWidth: 100,
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  {
+    field: 'bankCardNo',
+    title: '卡号/地址',
     minWidth: 180,
     showOverflow: 'tooltip',
     formatter({ cellValue }) {
@@ -108,22 +140,30 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'withdrawStatus',
-    title: '提现状态',
+    field: 'status',
+    title: '状态',
     minWidth: 100,
     slots: {
       default: ({ row }) => {
-        const item = statusTagMap[row.withdrawStatus] ?? {
+        const item = statusTagMap[row.status] ?? {
           color: 'default',
-          label: row.withdrawStatus || '-',
+          label: row.status || '-',
         };
         return <Tag color={item.color}>{item.label}</Tag>;
       },
     },
   },
-  { field: 'withdrawType', title: '提现类型', minWidth: 100 },
-  { field: 'createTime', title: '创建时间', minWidth: 160 },
-  { field: 'updateTime', title: '更新时间', minWidth: 160 },
+  {
+    field: 'rejectReason',
+    title: '拒绝原因',
+    minWidth: 140,
+    showOverflow: 'tooltip',
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  { field: 'createdAt', title: '创建时间', minWidth: 160 },
+  { field: 'updatedAt', title: '更新时间', minWidth: 160 },
   {
     field: 'action',
     fixed: 'right',
