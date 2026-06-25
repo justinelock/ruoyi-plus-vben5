@@ -4,7 +4,15 @@ import type { VxeGridProps } from '#/adapter/vxe-table';
 
 import { getPopupContainer } from '@vben/utils';
 
+import { Tag } from 'antdv-next';
+
 import { renderCopyableValue } from '#/utils/render-copyable';
+
+import {
+  formatAccountType,
+  formatFlowAmount,
+  formatFlowType,
+} from './flow-labels';
 
 const levelOptions = [
   { label: 'VIP0', value: '0' },
@@ -154,36 +162,76 @@ export const columns: VxeGridProps['columns'] = [
   },
 ];
 
-/** 流水明细表格列 */
+/** 流水抽屉表格列（对齐 Java 账户流水管理端展示顺序） */
 export const flowColumns: VxeGridProps['columns'] = [
-  { field: 'flowType', title: '流水类型', minWidth: 120 },
+  { field: 'createdAt', title: '交易时间', minWidth: 160 },
   {
-    field: 'flowAmount',
-    title: '变动金额',
+    field: 'accountType',
+    title: '账户类型',
     minWidth: 100,
     formatter({ cellValue }) {
-      return cellValue ?? '0.00';
+      return formatAccountType(cellValue);
     },
   },
   {
-    field: 'beforeAmount',
-    title: '变动前',
-    minWidth: 100,
+    field: 'flowType',
+    title: '交易类型',
+    minWidth: 120,
     formatter({ cellValue }) {
-      return cellValue ?? '0.00';
+      return formatFlowType(cellValue);
     },
   },
   {
     field: 'afterAmount',
-    title: '变动后',
-    minWidth: 100,
+    title: '交易后余额',
+    minWidth: 110,
     formatter({ cellValue }) {
-      return cellValue ?? '0.00';
+      return formatFlowAmount(cellValue);
     },
   },
-  { field: 'accountType', title: '账户类型', minWidth: 90 },
-  { field: 'currency', title: '币种', minWidth: 80 },
-  { field: 'status', title: '状态', minWidth: 90 },
+  {
+    field: 'flowAmount',
+    title: '变动金额',
+    minWidth: 110,
+    slots: {
+      default: ({ row }) => {
+        const amount = Number(row.flowAmount ?? 0);
+        const text = formatFlowAmount(amount);
+        const color =
+          amount > 0 ? 'text-[#52c41a]' : amount < 0 ? 'text-[#ff4d4f]' : '';
+        return <span class={color}>{text}</span>;
+      },
+    },
+  },
+  {
+    field: 'beforeAmount',
+    title: '交易前余额',
+    minWidth: 110,
+    formatter({ cellValue }) {
+      return formatFlowAmount(cellValue);
+    },
+  },
+  {
+    field: 'status',
+    title: '交易状态',
+    minWidth: 100,
+    slots: {
+      default: ({ row }) => (
+        <Tag color={row.status === 'SUCCESS' ? 'success' : 'default'}>
+          {row.status || '-'}
+        </Tag>
+      ),
+    },
+  },
+  {
+    field: 'description',
+    title: '交易描述',
+    minWidth: 140,
+    showOverflow: 'tooltip',
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
   {
     field: 'remark',
     title: '备注',
@@ -193,5 +241,4 @@ export const flowColumns: VxeGridProps['columns'] = [
       return cellValue || '-';
     },
   },
-  { field: 'createdAt', title: '时间', minWidth: 160 },
 ];

@@ -50,6 +50,10 @@ export interface MemberReportQuery {
   pageSize?: number;
   keyword?: string;
   level?: string;
+  status?: string;
+  verified?: string;
+  orderField?: string;
+  order?: string;
   createTime?: string[];
   [key: string]: any;
 }
@@ -57,5 +61,11 @@ export interface MemberReportQuery {
 export interface MemberReportFlowQuery {
   pageNum?: number;
   pageSize?: number;
+  status?: string;
+  type?: string;
+  keyword?: string;
+  username?: string;
+  mobile?: string;
+  realName?: string;
   [key: string]: any;
 }

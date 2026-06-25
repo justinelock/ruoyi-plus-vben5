@@ -68,7 +68,8 @@ const [FlowDrawer, flowDrawerApi] = useVbenDrawer({
 function handleViewFlow(row: MemberReport) {
   flowDrawerApi.setData({
     userId: row.userId,
-    realName: row.realName || row.username,
+    realName: row.realName,
+    username: row.username,
   });
   flowDrawerApi.open();
 }

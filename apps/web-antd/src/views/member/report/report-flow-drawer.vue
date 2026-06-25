@@ -11,6 +11,8 @@ import { memberReportFlow } from '#/api/member/report';
 import { flowColumns } from './data';
 
 const currentUserId = ref('');
+/** 抽屉标题展示名：真实姓名优先，否则用户名 */
+const displayName = ref('用户');
 
 const gridOptions: VxeGridProps = {
   columns: flowColumns,
@@ -39,23 +41,27 @@ const [BasicTable, tableApi] = useVbenVxeGrid({ gridOptions });
 const [BasicDrawer, drawerApi] = useVbenDrawer({
   async onOpenChange(isOpen) {
     if (isOpen) {
-      const { userId } = drawerApi.getData() as { userId?: string };
-      currentUserId.value = userId ?? '';
+      const data = drawerApi.getData() as {
+        userId?: string;
+        realName?: string;
+        username?: string;
+      };
+      currentUserId.value = data.userId ?? '';
+      displayName.value =
+        data.realName?.trim() || data.username?.trim() || '用户';
       await tableApi.reload();
     } else {
       currentUserId.value = '';
+      displayName.value = '用户';
     }
   },
 });
 
-const drawerTitle = computed(() => {
-  const { realName } = drawerApi.getData() as { realName?: string };
-  return realName ? `${realName}的流水记录` : '流水记录';
-});
+const drawerTitle = computed(() => `${displayName.value}的流水记录`);
 </script>
 
 <template>
-  <BasicDrawer :title="drawerTitle" class="w-[900px]">
+  <BasicDrawer :title="drawerTitle" class="w-[1100px]">
     <BasicTable />
   </BasicDrawer>
 </template>
