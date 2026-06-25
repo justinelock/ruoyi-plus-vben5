@@ -32,7 +32,7 @@ const cards: Array<{
     >
       <div class="team-stat-card__label text-sm">{{ item.label }}</div>
       <div
-        class="team-stat-card__value mt-1 text-2xl font-semibold"
+        class="team-stat-card__value mt-1 text-xl font-semibold"
         :class="{ 'team-stat-card__value--money': item.money }"
       >
         <template v-if="item.money">

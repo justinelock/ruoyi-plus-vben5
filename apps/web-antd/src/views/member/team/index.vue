@@ -6,15 +6,17 @@ import type { MemberTeam, MemberTeamStats } from '#/api/member/team/model';
 
 import { onMounted, ref } from 'vue';
 
-import { Page } from '@vben/common-ui';
-
-import { Space } from 'antdv-next';
+import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
 
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { memberTeamList, memberTeamStats } from '#/api/member/team';
 
 import { columns, querySchema } from './data';
+import TeamAgentLevelModal from './team-agent-level-modal.vue';
+import TeamChangeParentModal from './team-change-parent-modal.vue';
+import TeamDetailModal from './team-detail-modal.vue';
+import TeamMembersDrawer from './team-members-drawer.vue';
 import TeamStats from './team-stats.vue';
 
 // 1. 顶部统计卡片：GET /member/team/stats，与列表筛选条件联动
@@ -57,10 +59,15 @@ async function loadStats(formValues: Record<string, any> = {}) {
   teamStats.value = await memberTeamStats(formValues);
 }
 
+/** 取查询区当前值（含未点「查询」时输入框内容），供列表/统计刷新 */
+async function getTeamQueryValues() {
+  return queryFormApi.getValues();
+}
+
 const [QueryForm, queryFormApi] = useVbenForm({
   ...inlineFormConfig,
   handleSubmit: async () => {
-    const values = await queryFormApi.getValues();
+    const values = await getTeamQueryValues();
     queryFormApi.setLatestSubmissionValues(values);
     await loadStats(values);
     await tableApi.reload(values);
@@ -97,7 +104,54 @@ onMounted(async () => {
   await tableApi.reload({});
 });
 
-function handleView(_row: MemberTeam) {}
+const [TeamDetailModalComp, teamDetailModalApi] = useVbenModal({
+  connectedComponent: TeamDetailModal,
+});
+
+const [TeamMembersDrawerComp, teamMembersDrawerApi] = useVbenDrawer({
+  connectedComponent: TeamMembersDrawer,
+  destroyOnClose: true,
+});
+
+const [TeamChangeParentModalComp, teamChangeParentModalApi] = useVbenModal({
+  connectedComponent: TeamChangeParentModal,
+});
+
+const [TeamAgentLevelModalComp, teamAgentLevelModalApi] = useVbenModal({
+  connectedComponent: TeamAgentLevelModal,
+});
+
+function handleDetail(row: MemberTeam) {
+  teamDetailModalApi.setData({ id: row.id });
+  teamDetailModalApi.open();
+}
+
+function handleMembers(row: MemberTeam) {
+  teamMembersDrawerApi.setData({
+    userId: row.id,
+    username: row.username,
+    realName: row.realName,
+  });
+  teamMembersDrawerApi.open();
+}
+
+function handleChangeParent(row: MemberTeam) {
+  teamChangeParentModalApi.setData({ record: row });
+  teamChangeParentModalApi.open();
+}
+
+function handleAgentLevel(row: MemberTeam) {
+  teamAgentLevelModalApi.setData({ record: row });
+  teamAgentLevelModalApi.open();
+}
+
+async function handleReload() {
+  const values = await getTeamQueryValues();
+  queryFormApi.setLatestSubmissionValues(values);
+  await loadStats(values);
+  await tableApi.reload(values);
+}
+
 function handleExport() {
   queryFormApi.submitForm();
 }
@@ -127,13 +181,35 @@ function handleExport() {
           <table-action-space>
             <action-button
               v-access:code="['member:team:list']"
-              @click.stop="handleView(row)"
+              @click.stop="handleDetail(row)"
             >
               详情
+            </action-button>
+            <action-button
+              v-access:code="['member:team:list']"
+              @click.stop="handleMembers(row)"
+            >
+              下级团队
+            </action-button>
+            <action-button
+              v-access:code="['member:team:list']"
+              @click.stop="handleChangeParent(row)"
+            >
+              更换上级
+            </action-button>
+            <action-button
+              v-access:code="['member:team:list']"
+              @click.stop="handleAgentLevel(row)"
+            >
+              代理层级
             </action-button>
           </table-action-space>
         </template>
       </BasicTable>
     </div>
+    <TeamDetailModalComp />
+    <TeamMembersDrawerComp />
+    <TeamChangeParentModalComp @reload="handleReload" />
+    <TeamAgentLevelModalComp @reload="handleReload" />
   </Page>
 </template>

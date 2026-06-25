@@ -44,3 +44,49 @@ export interface MemberTeamQuery {
   registerTime?: string[];
   [key: string]: any;
 }
+
+/** 团队详情弹窗 */
+export interface MemberTeamDetail {
+  id: string;
+  username: string;
+  agentLevel: number;
+  walletCount: number;
+  totalAssets: number;
+  totalDeposit: number;
+  totalWithdraw: number;
+  createdAt: string;
+}
+
+/** 下级团队成员行 */
+export interface MemberTeamMember {
+  level: number;
+  username: string;
+  totalAssets: number;
+  totalDeposit: number;
+  totalInvest: number;
+  totalWithdraw: number;
+}
+
+export interface MemberTeamChangeParentParam {
+  userId: string;
+  /** 新上级用户名（必填） */
+  username: string;
+}
+
+/** 更换上级成功响应（data 内） */
+export interface MemberTeamChangeParentResult {
+  userId: string;
+  parentId?: string;
+  parentUsername?: string;
+}
+
+export interface MemberTeamAgentLevelParam {
+  userId: string;
+  agentLevel: number;
+}
+
+/** 调整代理层级成功响应（data 内） */
+export interface MemberTeamAgentLevelResult {
+  userId: string;
+  agentLevel: number;
+}

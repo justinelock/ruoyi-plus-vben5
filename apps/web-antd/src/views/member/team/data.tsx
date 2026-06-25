@@ -9,6 +9,12 @@ import { getDictOptions } from '#/utils/dict';
 import { renderCopyableValue } from '#/utils/render-copyable';
 import { renderDict } from '#/utils/render';
 
+/** 金额展示：对齐详情弹窗 $ 0.00 */
+export function formatTeamMoney(value?: number | null) {
+  const num = Number(value ?? 0);
+  return `$ ${num.toFixed(2)}`;
+}
+
 export const querySchema: FormSchemaGetter = () => [
   {
     component: 'Input',
@@ -117,5 +123,57 @@ export const columns: VxeGridProps['columns'] = [
     title: '操作',
     resizable: false,
     width: 'auto',
+  },
+];
+
+/** 下级团队抽屉列 */
+export const teamMemberColumns: VxeGridProps['columns'] = [
+  {
+    field: 'level',
+    title: '级别',
+    minWidth: 80,
+    formatter({ cellValue }) {
+      return cellValue ?? '-';
+    },
+  },
+  {
+    field: 'username',
+    title: '用户名',
+    minWidth: 140,
+    slots: {
+      default: ({ row }) => renderCopyableValue(row.username),
+    },
+  },
+  {
+    field: 'totalAssets',
+    title: '总资产',
+    minWidth: 120,
+    formatter({ cellValue }) {
+      return formatTeamMoney(cellValue);
+    },
+  },
+  {
+    field: 'totalDeposit',
+    title: '总充值',
+    minWidth: 120,
+    formatter({ cellValue }) {
+      return formatTeamMoney(cellValue);
+    },
+  },
+  {
+    field: 'totalInvest',
+    title: '总投信',
+    minWidth: 120,
+    formatter({ cellValue }) {
+      return formatTeamMoney(cellValue);
+    },
+  },
+  {
+    field: 'totalWithdraw',
+    title: '总提现',
+    minWidth: 120,
+    formatter({ cellValue }) {
+      return formatTeamMoney(cellValue);
+    },
   },
 ];
