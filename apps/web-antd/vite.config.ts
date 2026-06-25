@@ -22,6 +22,7 @@ export default defineConfig(async () => {
       ],
       server: {
         proxy: {
+          // 统一走 Traefik 网关（勿直连 8091/8092）；业务路由见 bin/traefik/dynamic.yaml
           '/api': {
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api/, ''),

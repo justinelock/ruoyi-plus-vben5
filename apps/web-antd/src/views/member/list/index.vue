@@ -19,19 +19,16 @@ import { columns, querySchema } from './data';
 /** 是否查看已删用户（切换后重新查询） */
 const showDeleted = ref(false);
 
-/** 标题 Tag：活跃用户数（与列表同筛选条件，来自 GET /member/user/stats） */
+/** 标题 Tag：近 5 分钟全局活跃用户数（GET /member/user/stats，Redis 全局，与列表筛选无关） */
 const totalActiveSessions = ref(0);
 
-/** 拉取活跃会话数，筛选条件与列表查询保持一致 */
-async function loadActiveSessions(formValues: Record<string, any> = {}) {
-  const stats = await memberUserStats({
-    ...formValues,
-    deleted: showDeleted.value ? '1' : '0',
-  });
+/** 拉取 Redis 全局活跃统计 */
+async function loadActiveSessions() {
+  const stats = await memberUserStats();
   totalActiveSessions.value = stats.totalActiveSessions ?? 0;
 }
 
-// 1. 单行 inline 筛选：关键词 + 认证状态 + 时间，与操作按钮同一行
+/** 单行 inline 筛选：关键词 + 认证状态 + 时间，与操作按钮同一行 */
 const formOptions: VbenFormProps = {
   schema: querySchema(),
   layout: 'inline',
@@ -62,7 +59,6 @@ const formOptions: VbenFormProps = {
   ],
 };
 
-// 2. 分页表格
 const gridOptions: VxeGridProps = {
   checkboxConfig: {
     highlight: true,
@@ -82,10 +78,10 @@ const gridOptions: VxeGridProps = {
           deleted: showDeleted.value ? '1' : '0',
           ...formValues,
         };
-        // 列表与活跃统计并行请求，保证标题 Tag 与当前筛选一致
+        // 列表与 Redis 全局 stats 并行拉取（stats 不受下方筛选影响）
         const [listResp] = await Promise.all([
           memberUserList(params),
-          loadActiveSessions(formValues),
+          loadActiveSessions(),
         ]);
         return listResp;
       },

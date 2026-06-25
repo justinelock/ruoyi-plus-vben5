@@ -18,14 +18,9 @@ export function memberUserList(params?: MemberUserQuery) {
 }
 
 /**
- * 用户列表活跃会话统计（标题 Tag「活跃用户」）
+ * 用户列表活跃统计（Redis 全局，近 5 分钟 presence 活跃用户数）
  * @see GET /member/user/stats
  */
-export function memberUserStats(
-  params?: Pick<MemberUserQuery, 'authStatus' | 'deleted' | 'keyword'> & {
-    'params[beginTime]'?: string;
-    'params[endTime]'?: string;
-  },
-) {
-  return alovaInstance.get<MemberUserStats>(Api.stats, { params });
+export function memberUserStats() {
+  return alovaInstance.get<MemberUserStats>(Api.stats);
 }
