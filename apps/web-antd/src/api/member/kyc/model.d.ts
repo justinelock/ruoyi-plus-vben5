@@ -20,6 +20,9 @@ export interface MemberKycQuery {
   pageSize?: number;
   keyword?: string;
   authStatus?: string;
+  idCardNo?: string;
+  username?: string;
+  realName?: string;
   submitTime?: string[];
   [key: string]: any;
 }

@@ -6,6 +6,8 @@ import { getPopupContainer } from '@vben/utils';
 
 import { Tag } from 'antdv-next';
 
+import { renderCopyableValue } from '#/utils/render-copyable';
+
 const loginResultOptions = [
   { label: '成功', value: 'SUCCESS' },
   { label: '失败', value: 'FAIL' },
@@ -101,7 +103,14 @@ const riskColorMap: Record<string, string> = {
 };
 
 export const columns: VxeGridProps['columns'] = [
-  { field: 'username', title: '用户名', minWidth: 120 },
+  {
+    field: 'username',
+    title: '用户名',
+    minWidth: 140,
+    slots: {
+      default: ({ row }) => renderCopyableValue(row.username),
+    },
+  },
   {
     field: 'realName',
     title: '真实姓名',

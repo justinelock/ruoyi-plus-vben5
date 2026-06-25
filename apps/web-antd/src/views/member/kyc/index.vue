@@ -4,14 +4,13 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { MemberKyc } from '#/api/member/kyc/model';
 
-import { Page } from '@vben/common-ui';
-
-import { Space } from 'antdv-next';
+import { Page, useVbenModal } from '@vben/common-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { memberKycList } from '#/api/member/kyc';
 
 import { columns, querySchema } from './data';
+import kycDetailModal from './kyc-detail-modal.vue';
 
 // 1. 单行 inline 筛选（与用户列表同布局）
 const formOptions: VbenFormProps = {
@@ -83,8 +82,13 @@ const [BasicTable] = useVbenVxeGrid({
   gridOptions,
 });
 
-function handleView(_row: MemberKyc) {
-  // 认证详情待业务接口就绪后接入
+const [KycDetailModal, kycDetailModalApi] = useVbenModal({
+  connectedComponent: kycDetailModal,
+});
+
+function handleView(row: MemberKyc) {
+  kycDetailModalApi.setData(row);
+  kycDetailModalApi.open();
 }
 
 function handleAudit(_row: MemberKyc) {
@@ -117,7 +121,7 @@ function handleExport() {
             详情
           </action-button>
           <action-button
-            v-if="row.authStatus === '2'"
+            v-if="row.status === 'PENDING'"
             v-access:code="['member:kyc:list']"
             @click.stop="handleAudit(row)"
           >
@@ -126,5 +130,6 @@ function handleExport() {
         </table-action-space>
       </template>
     </BasicTable>
+    <KycDetailModal />
   </Page>
 </template>

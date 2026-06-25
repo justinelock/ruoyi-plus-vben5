@@ -4,6 +4,8 @@ import type { VxeGridProps } from '#/adapter/vxe-table';
 
 import { getPopupContainer } from '@vben/utils';
 
+import { renderCopyableValue } from '#/utils/render-copyable';
+
 export const querySchema: FormSchemaGetter = () => [
   {
     component: 'Input',
@@ -62,9 +64,9 @@ export const columns: VxeGridProps['columns'] = [
   {
     field: 'userName',
     title: '用户名',
-    minWidth: 120,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    minWidth: 140,
+    slots: {
+      default: ({ row }) => renderCopyableValue(row.userName),
     },
   },
   {

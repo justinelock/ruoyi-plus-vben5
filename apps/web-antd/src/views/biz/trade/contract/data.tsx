@@ -6,6 +6,8 @@ import { getPopupContainer } from '@vben/utils';
 
 import { Tag } from 'antdv-next';
 
+import { renderCopyableValue } from '#/utils/render-copyable';
+
 const statusOptions = [
   { label: '进行中', value: '0' },
   { label: '已结算', value: '1' },
@@ -82,9 +84,9 @@ export const columns: VxeGridProps['columns'] = [
   {
     field: 'userName',
     title: '用户名',
-    minWidth: 120,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    minWidth: 140,
+    slots: {
+      default: ({ row }) => renderCopyableValue(row.userName),
     },
   },
   {

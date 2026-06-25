@@ -6,6 +6,8 @@ import { getPopupContainer } from '@vben/utils';
 
 import { Tag } from 'antdv-next';
 
+import { renderCopyableValue } from '#/utils/render-copyable';
+
 const accountTypeOptions = [
   { label: '主账户', value: 'main' },
   { label: '子账户', value: 'sub' },
@@ -70,7 +72,14 @@ export const querySchema: FormSchemaGetter = () => [
 
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
-  { field: 'userName', title: '用户名', minWidth: 120 },
+  {
+    field: 'userName',
+    title: '用户名',
+    minWidth: 140,
+    slots: {
+      default: ({ row }) => renderCopyableValue(row.userName),
+    },
+  },
   {
     field: 'realName',
     title: '真实姓名',

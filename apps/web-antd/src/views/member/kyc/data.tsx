@@ -5,6 +5,8 @@ import { getPopupContainer } from '@vben/utils';
 
 import { Image, Space, Tag } from 'antdv-next';
 
+import { renderCopyableValue } from '#/utils/render-copyable';
+
 /** 认证状态筛选项 */
 export const authStatusOptions = [
   { label: '未认证', value: 'UNVERIFIED' },
@@ -13,14 +15,15 @@ export const authStatusOptions = [
   { label: '已拒绝', value: 'REJECTED' },
 ];
 
-const authStatusTagMap: Record<string, { color: string; label: string }> = {
+/** 列表/详情共用：认证状态 Tag 配色与文案 */
+export const authStatusTagMap: Record<string, { color: string; label: string }> = {
   UNVERIFIED: { color: 'default', label: '未认证' },
-  VERIFIED: { color: 'success', label: '已认证' },
+  VERIFIED: { color: 'success', label: '已通过' },
   PENDING: { color: 'processing', label: '认证中' },
   REJECTED: { color: 'error', label: '已拒绝' },
 };
 
-function renderAuthStatus(status?: string) {
+export function renderAuthStatus(status?: string) {
   const item = authStatusTagMap[status ?? ''] ?? {
     color: 'default',
     label: status || '-',
@@ -63,7 +66,14 @@ export const querySchema: FormSchemaGetter = () => [
 
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
-  { field: 'username', title: '用户名', minWidth: 120 },
+  {
+    field: 'username',
+    title: '用户名',
+    minWidth: 140,
+    slots: {
+      default: ({ row }) => renderCopyableValue(row.username),
+    },
+  },
   {
     field: 'realName',
     title: '真实姓名',

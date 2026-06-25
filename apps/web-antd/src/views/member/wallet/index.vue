@@ -6,10 +6,10 @@ import type { MemberWallet } from '#/api/member/wallet/model';
 
 import { Page } from '@vben/common-ui';
 
-import { Space } from 'antdv-next';
+import { Popconfirm } from 'antdv-next';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { memberWalletList } from '#/api/member/wallet';
+import { memberWalletList, memberWalletRemove } from '#/api/member/wallet';
 
 import { columns, querySchema } from './data';
 
@@ -50,10 +50,13 @@ const gridOptions: VxeGridProps = {
   id: 'member-wallet-index',
 };
 
-const [BasicTable] = useVbenVxeGrid({ formOptions, gridOptions });
+const [BasicTable, tableApi] = useVbenVxeGrid({ formOptions, gridOptions });
 
-function handleView(_row: MemberWallet) {}
-function handleEdit(_row: MemberWallet) {}
+async function handleDelete(row: MemberWallet) {
+  await memberWalletRemove([row.id]);
+  await tableApi.query();
+}
+
 function handleExport() {}
 </script>
 
@@ -71,18 +74,19 @@ function handleExport() {}
       </template>
       <template #action="{ row }">
         <table-action-space>
-          <action-button
-            v-access:code="['member:wallet:list']"
-            @click.stop="handleView(row)"
+          <Popconfirm
+            placement="left"
+            title="确认删除该钱包？"
+            @confirm="handleDelete(row)"
           >
-            详情
-          </action-button>
-          <action-button
-            v-access:code="['member:wallet:list']"
-            @click.stop="handleEdit(row)"
-          >
-            编辑
-          </action-button>
+            <action-button
+              danger
+              v-access:code="['member:wallet:list']"
+              @click.stop=""
+            >
+              删除
+            </action-button>
+          </Popconfirm>
         </table-action-space>
       </template>
     </BasicTable>

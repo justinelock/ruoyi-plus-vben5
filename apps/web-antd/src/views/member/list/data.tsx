@@ -7,7 +7,12 @@ import { getPopupContainer } from '@vben/utils';
 
 import { Tag, Tooltip } from 'antdv-next';
 
-import { copyText } from './copy-text';
+import { copyText } from '#/utils/copy-text';
+import {
+  CopyIcon,
+  renderCopyableValue,
+  stopRowClick,
+} from '#/utils/render-copyable';
 
 /** 认证状态筛选项（业务字典未接入前使用固定选项） */
 const authStatusOptions = [
@@ -58,20 +63,6 @@ type ColumnOptions = {
   deletedList?: boolean;
 };
 
-function stopRowClick(e: Event) {
-  e.stopPropagation();
-}
-
-/** fluent:copy-16-filled（UnoCSS iconify） */
-function CopyIcon({ onClick }: { onClick: (e: MouseEvent) => void }) {
-  return (
-    <span
-      class="size-14px icon-[fluent--copy-16-filled] inline-block shrink-0 cursor-pointer text-primary hover:opacity-80"
-      onClick={onClick}
-    />
-  );
-}
-
 /** fluent:wallet-16-filled */
 function WalletIcon({
   disabled,
@@ -109,26 +100,6 @@ function IdCardIcon({
       }
       onClick={onClick}
     />
-  );
-}
-
-/** 值 + 复制图标 */
-function renderCopyableValue(value?: null | number | string) {
-  const text = value === null || value === undefined || value === '' ? '-' : String(value);
-  return (
-    <span class="inline-flex items-center gap-1">
-      <span>{text}</span>
-      {text !== '-' ? (
-        <Tooltip title="复制">
-          <CopyIcon
-            onClick={(e) => {
-              stopRowClick(e);
-              copyText(text);
-            }}
-          />
-        </Tooltip>
-      ) : null}
-    </span>
   );
 }
 

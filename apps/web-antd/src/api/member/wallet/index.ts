@@ -5,7 +5,7 @@ import type {
   MemberWalletQuery,
 } from './model';
 
-import type { PageResult } from '#/api/common';
+import type { IDS, PageResult } from '#/api/common';
 
 import { alovaInstance } from '#/utils/http';
 
@@ -13,6 +13,7 @@ enum Api {
   addOrSubtract = '/member/wallet/addOrSubtract',
   action = '/member/wallet/action',
   list = '/member/wallet/list',
+  root = '/member/wallet',
 }
 
 /**
@@ -28,6 +29,15 @@ export function memberWalletList(params?: MemberWalletQuery) {
  */
 export function memberWalletAddOrSubtract(data: MemberWalletAddOrSubtractReq) {
   return alovaInstance.put<void>(Api.addOrSubtract, data);
+}
+
+/**
+ * 删除钱包（按 fb_user_wallets.id）
+ * @see DELETE /member/wallet/{ids}
+ */
+export function memberWalletRemove(ids: IDS) {
+  const idStr = Array.isArray(ids) ? ids.join(',') : ids;
+  return alovaInstance.deleteWithMsg<void>(`${Api.root}/${idStr}`);
 }
 
 /**

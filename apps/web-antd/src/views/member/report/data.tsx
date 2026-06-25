@@ -4,6 +4,8 @@ import type { VxeGridProps } from '#/adapter/vxe-table';
 
 import { getPopupContainer } from '@vben/utils';
 
+import { renderCopyableValue } from '#/utils/render-copyable';
+
 const levelOptions = [
   { label: 'VIP0', value: '0' },
   { label: 'VIP1', value: '1' },
@@ -48,7 +50,14 @@ export const querySchema: FormSchemaGetter = () => [
 
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
-  { field: 'username', title: '用户名', minWidth: 120 },
+  {
+    field: 'username',
+    title: '用户名',
+    minWidth: 140,
+    slots: {
+      default: ({ row }) => renderCopyableValue(row.username),
+    },
+  },
   {
     field: 'realName',
     title: '真实姓名',

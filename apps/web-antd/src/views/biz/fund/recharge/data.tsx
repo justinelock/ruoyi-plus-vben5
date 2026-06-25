@@ -6,6 +6,8 @@ import { getPopupContainer } from '@vben/utils';
 
 import { Image, Tag } from 'antdv-next';
 
+import { renderCopyableValue } from '#/utils/render-copyable';
+
 const statusOptions = [
   { label: '待审核', value: '0' },
   { label: '已通过', value: '1' },
@@ -53,7 +55,14 @@ export const querySchema: FormSchemaGetter = () => [
 
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
-  { field: 'userName', title: '用户名', minWidth: 120 },
+  {
+    field: 'userName',
+    title: '用户名',
+    minWidth: 140,
+    slots: {
+      default: ({ row }) => renderCopyableValue(row.userName),
+    },
+  },
   {
     field: 'phoneNumber',
     title: '手机号',

@@ -6,6 +6,7 @@ import { DictEnum } from '@vben/constants';
 import { getPopupContainer } from '@vben/utils';
 
 import { getDictOptions } from '#/utils/dict';
+import { renderCopyableValue } from '#/utils/render-copyable';
 import { renderDict } from '#/utils/render';
 
 export const querySchema: FormSchemaGetter = () => [
@@ -43,7 +44,14 @@ export const querySchema: FormSchemaGetter = () => [
 
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
-  { field: 'username', title: '用户名', minWidth: 120 },
+  {
+    field: 'username',
+    title: '用户名',
+    minWidth: 140,
+    slots: {
+      default: ({ row }) => renderCopyableValue(row.username),
+    },
+  },
   {
     field: 'balance',
     title: '余额',

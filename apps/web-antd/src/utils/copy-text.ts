@@ -1,4 +1,4 @@
-/** 表格内一键复制（legacy 兼容见 workflow approval-panel） */
+/** 表格/详情内一键复制（legacy 兼容见 workflow approval-panel） */
 export async function copyText(text?: null | number | string) {
   const value = text === null || text === undefined ? '' : String(text).trim();
   if (!value || value === '-') {
