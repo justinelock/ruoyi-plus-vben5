@@ -4,16 +4,15 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { FundStatement } from '#/api/biz/fund/statement/model';
 
-import { Page } from '@vben/common-ui';
-
-import { Space } from 'antdv-next';
+import { Page, useVbenModal } from '@vben/common-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { fundStatementList } from '#/api/biz/fund/statement';
 
 import { columns, querySchema } from './data';
+import StatementDetailModal from './statement-detail-modal.vue';
 
-// 1. 单行 inline 筛选 + tradeTime 时间范围映射（对接 GET /fund/statement/list）
+// 1. 单行 inline 筛选 + tradeTime 映射 params[beginTime/endTime]（后端 f.created_at BETWEEN）
 const formOptions: VbenFormProps = {
   schema: querySchema(),
   layout: 'inline',
@@ -34,7 +33,6 @@ const formOptions: VbenFormProps = {
   ],
 };
 
-// 2. 分页表格
 const gridOptions: VxeGridProps = {
   checkboxConfig: { highlight: true, reserve: true, trigger: 'default' },
   columns,
@@ -59,7 +57,15 @@ const gridOptions: VxeGridProps = {
 
 const [BasicTable] = useVbenVxeGrid({ formOptions, gridOptions });
 
-function handleView(_row: FundStatement) {}
+const [DetailModal, detailModalApi] = useVbenModal({
+  connectedComponent: StatementDetailModal,
+});
+
+function handleView(row: FundStatement) {
+  detailModalApi.setData({ id: row.id });
+  detailModalApi.open();
+}
+
 function handleExport() {}
 </script>
 
@@ -86,5 +92,6 @@ function handleExport() {}
         </table-action-space>
       </template>
     </BasicTable>
+    <DetailModal />
   </Page>
 </template>

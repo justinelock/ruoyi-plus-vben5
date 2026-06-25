@@ -1,4 +1,4 @@
-/** 账户流水列表：筛选 schema 与表格列（字段对齐 FundStatementItem） */
+/** 账户流水列表：筛选 schema 与表格列（对齐 1.5.1 用户报表流水） */
 import type { FormSchemaGetter } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
@@ -8,22 +8,16 @@ import { Tag } from 'antdv-next';
 
 import { renderCopyableValue } from '#/utils/render-copyable';
 
-const accountTypeOptions = [
-  { label: '主账户', value: 'main' },
-  { label: '子账户', value: 'sub' },
-];
+import {
+  formatAccountType,
+  formatFlowAmount,
+  formatFlowType,
+} from '#/views/member/report/flow-labels';
 
-const tradeTypeOptions = [
-  { label: '充值', value: 'recharge' },
-  { label: '提现', value: 'withdraw' },
-  { label: '转账', value: 'transfer' },
-  { label: '手续费', value: 'fee' },
-];
-
-const tradeStatusOptions = [
-  { label: '成功', value: '0' },
-  { label: '失败', value: '1' },
-  { label: '处理中', value: '2' },
+const statusOptions = [
+  { label: 'SUCCESS', value: 'SUCCESS' },
+  { label: 'FAILED', value: 'FAILED' },
+  { label: 'PENDING', value: 'PENDING' },
 ];
 
 const currencyOptions = [
@@ -37,21 +31,18 @@ export const querySchema: FormSchemaGetter = () => [
     component: 'Input',
     fieldName: 'keyword',
     componentProps: {
-      placeholder: '用户名/手机号/用户ID',
+      placeholder: '用户名/手机号/业务单号',
       class: 'w-[220px]',
     },
     formItemClass: 'pb-0',
   },
   {
-    component: 'Select',
+    component: 'Input',
+    fieldName: 'type',
     componentProps: {
-      getPopupContainer,
-      allowClear: true,
-      class: 'w-[120px]',
-      options: tradeTypeOptions,
       placeholder: '交易类型',
+      class: 'w-[140px]',
     },
-    fieldName: 'tradeType',
     formItemClass: 'pb-0',
   },
   {
@@ -60,10 +51,10 @@ export const querySchema: FormSchemaGetter = () => [
       getPopupContainer,
       allowClear: true,
       class: 'w-[120px]',
-      options: tradeStatusOptions,
+      options: statusOptions,
       placeholder: '交易状态',
     },
-    fieldName: 'tradeStatus',
+    fieldName: 'status',
     formItemClass: 'pb-0',
   },
   {
@@ -92,15 +83,15 @@ export const querySchema: FormSchemaGetter = () => [
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
   {
-    field: 'userName',
+    field: 'username',
     title: '用户名',
     minWidth: 140,
     slots: {
-      default: ({ row }) => renderCopyableValue(row.userName),
+      default: ({ row }) => renderCopyableValue(row.username),
     },
   },
   {
-    field: 'phoneNumber',
+    field: 'mobile',
     title: '手机号',
     minWidth: 120,
     formatter({ cellValue }) {
@@ -115,54 +106,68 @@ export const columns: VxeGridProps['columns'] = [
       return cellValue || '-';
     },
   },
-  { field: 'accountType', title: '账户类型', minWidth: 100 },
-  { field: 'tradeType', title: '交易类型', minWidth: 100 },
+  { field: 'createdAt', title: '交易时间', minWidth: 160 },
   {
-    field: 'changeAmount',
-    title: '变动金额',
-    minWidth: 110,
+    field: 'accountType',
+    title: '账户类型',
+    minWidth: 100,
     formatter({ cellValue }) {
-      return cellValue ?? '0.00';
+      return formatAccountType(cellValue);
     },
   },
   {
-    field: 'balanceBefore',
+    field: 'flowType',
+    title: '交易类型',
+    minWidth: 120,
+    formatter({ cellValue }) {
+      return formatFlowType(cellValue);
+    },
+  },
+  {
+    field: 'flowAmount',
+    title: '变动金额',
+    minWidth: 110,
+    slots: {
+      default: ({ row }) => {
+        const amount = Number(row.flowAmount ?? 0);
+        const text = formatFlowAmount(amount);
+        const color =
+          amount > 0 ? 'text-[#52c41a]' : amount < 0 ? 'text-[#ff4d4f]' : '';
+        return <span class={color}>{text}</span>;
+      },
+    },
+  },
+  {
+    field: 'beforeAmount',
     title: '交易前余额',
     minWidth: 110,
     formatter({ cellValue }) {
-      return cellValue ?? '0.00';
+      return formatFlowAmount(cellValue);
     },
   },
   {
-    field: 'balanceAfter',
+    field: 'afterAmount',
     title: '交易后余额',
     minWidth: 110,
     formatter({ cellValue }) {
-      return cellValue ?? '0.00';
+      return formatFlowAmount(cellValue);
     },
   },
   {
-    field: 'tradeStatus',
+    field: 'status',
     title: '交易状态',
     minWidth: 100,
     slots: {
-      default: ({ row }) => {
-        const map: Record<string, { color: string; label: string }> = {
-          '0': { color: 'success', label: '成功' },
-          '1': { color: 'error', label: '失败' },
-          '2': { color: 'processing', label: '处理中' },
-        };
-        const item = map[row.tradeStatus] ?? {
-          color: 'default',
-          label: row.tradeStatus || '-',
-        };
-        return <Tag color={item.color}>{item.label}</Tag>;
-      },
+      default: ({ row }) => (
+        <Tag color={row.status === 'SUCCESS' ? 'success' : 'default'}>
+          {row.status || '-'}
+        </Tag>
+      ),
     },
   },
   { field: 'currency', title: '币种', minWidth: 80 },
   {
-    field: 'tradeDesc',
+    field: 'description',
     title: '交易描述',
     minWidth: 140,
     showOverflow: 'tooltip',
@@ -179,7 +184,6 @@ export const columns: VxeGridProps['columns'] = [
       return cellValue || '-';
     },
   },
-  { field: 'tradeTime', title: '交易时间', minWidth: 160 },
   {
     field: 'action',
     fixed: 'right',
