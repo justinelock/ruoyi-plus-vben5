@@ -1,10 +1,16 @@
-import type { MemberWallet, MemberWalletActionReq, MemberWalletQuery } from './model';
+import type {
+  MemberWallet,
+  MemberWalletActionReq,
+  MemberWalletAddOrSubtractReq,
+  MemberWalletQuery,
+} from './model';
 
 import type { PageResult } from '#/api/common';
 
 import { alovaInstance } from '#/utils/http';
 
 enum Api {
+  addOrSubtract = '/member/wallet/addOrSubtract',
   action = '/member/wallet/action',
   list = '/member/wallet/list',
 }
@@ -18,8 +24,14 @@ export function memberWalletList(params?: MemberWalletQuery) {
 }
 
 /**
- * 钱包操作（加减款/开关账户/冻解金额/加减券/划转）
- * 后端契约待补充；接口未就绪时返回 placeholder 供弹窗区分提示
+ * 管理端加减款（对齐 PUT /member/wallet/addOrSubtract）
+ */
+export function memberWalletAddOrSubtract(data: MemberWalletAddOrSubtractReq) {
+  return alovaInstance.put<void>(Api.addOrSubtract, data);
+}
+
+/**
+ * 其他钱包操作（开关账户/冻解金额/加减券/划转）占位
  */
 export async function memberWalletAction(
   data: MemberWalletActionReq,

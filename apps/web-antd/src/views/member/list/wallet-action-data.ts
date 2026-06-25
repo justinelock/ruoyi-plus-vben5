@@ -16,6 +16,25 @@ export const walletActionTitles: Record<WalletActionType, string> = {
   transfer: '划转',
 };
 
+type FlowTypeOption = {
+  label: string;
+  value: string;
+};
+
+/** 管理端用户钱包「加款」可选 flowType（充值/彩金/团队分红/划转） */
+export const adminAddAmountTypeOptions: FlowTypeOption[] = [
+  { value: 'ADD_AMOUNT', label: '充值' },
+  { value: 'ADD_BONUS', label: '彩金' },
+  { value: 'ADD_DIVIDEND', label: '团队分红' },
+  { value: 'ADD_TRANSFER', label: '划转' },
+];
+
+/** 管理端用户钱包「减款」可选 flowType（减款/划转） */
+export const adminSubtractAmountTypeOptions: FlowTypeOption[] = [
+  { value: 'SUBTRACT_AMOUNT', label: '减款' },
+  { value: 'ADD_TRANSFER', label: '划转' },
+];
+
 const accountTypeLabelMap: Record<string, string> = {
   main: '主账户',
   sub: '子账户',
@@ -35,6 +54,7 @@ function readonlyInput(label: string, fieldName: string) {
 /** 按操作类型生成弹窗表单 schema（字典类型编辑弹窗同款 VbenForm） */
 export function createWalletActionSchema(
   actionType: WalletActionType,
+  onBalanceDirectionChange?: (direction: 'add' | 'sub') => void,
 ): ReturnType<FormSchemaGetter> {
   const base = [
     {
@@ -46,14 +66,25 @@ export function createWalletActionSchema(
       fieldName: 'walletId',
       label: 'walletId',
     },
-    readonlyInput('钱包类型', 'accountType'),
-    readonlyInput('货币', 'currency'),
+    {
+      ...readonlyInput('钱包类型', 'accountType'),
+      formItemClass: 'col-span-1',
+    },
+    {
+      ...readonlyInput('货币', 'currency'),
+      dependencies: {
+        // 加减款弹窗隐藏货币（保留字段，便于后续恢复）
+        show: () => actionType !== 'balance',
+        triggerFields: [''],
+      },
+    },
     {
       component: 'Input' as const,
       componentProps: {
         disabled: true,
       },
       fieldName: 'balance',
+      formItemClass: 'col-span-1',
       label: '可用余额',
     },
     {
@@ -84,6 +115,11 @@ export function createWalletActionSchema(
           component: 'RadioGroup',
           componentProps: {
             buttonStyle: 'solid',
+            onChange: (event: any) => {
+              const direction =
+                event?.target?.value === 'sub' || event === 'sub' ? 'sub' : 'add';
+              onBalanceDirectionChange?.(direction);
+            },
             optionType: 'button',
             options: [
               { label: '加款', value: 'add' },
@@ -93,6 +129,36 @@ export function createWalletActionSchema(
           defaultValue: 'add',
           fieldName: 'direction',
           label: '操作类型',
+          rules: 'selectRequired',
+        },
+        {
+          component: 'RadioGroup',
+          componentProps: {
+            buttonStyle: 'solid',
+            options: adminAddAmountTypeOptions,
+            optionType: 'button',
+          },
+          dependencies: {
+            show: ({ direction }: Record<string, string>) => direction === 'add',
+            triggerFields: ['direction'],
+          },
+          fieldName: 'flowType',
+          label: '流水类型',
+          rules: 'selectRequired',
+        },
+        {
+          component: 'RadioGroup',
+          componentProps: {
+            buttonStyle: 'solid',
+            options: adminSubtractAmountTypeOptions,
+            optionType: 'button',
+          },
+          dependencies: {
+            show: ({ direction }: Record<string, string>) => direction === 'sub',
+            triggerFields: ['direction'],
+          },
+          fieldName: 'flowType',
+          label: '流水类型',
           rules: 'selectRequired',
         },
         {

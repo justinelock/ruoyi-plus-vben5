@@ -36,3 +36,12 @@ export interface MemberWalletActionReq {
   targetAccountType?: string;
   remark?: string;
 }
+
+/** 管理端加减款（对齐 MemberWalletAddOrSubtractReq / Java FbAddSubtractRequest） */
+export interface MemberWalletAddOrSubtractReq {
+  id: string;
+  type: boolean;
+  amount: number;
+  remark?: string;
+  flowType?: string;
+}

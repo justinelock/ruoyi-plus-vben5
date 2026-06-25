@@ -7,10 +7,12 @@ import { useVbenModal } from '@vben/common-ui';
 import { cloneDeep } from '@vben/utils';
 
 import { useVbenForm } from '#/adapter/form';
-import { memberWalletAction } from '#/api/member/wallet';
+import { memberWalletAction, memberWalletAddOrSubtract } from '#/api/member/wallet';
 import { defaultFormValueGetter, useBeforeCloseDiff } from '#/utils/popup';
 
 import {
+  adminAddAmountTypeOptions,
+  adminSubtractAmountTypeOptions,
   buildWalletActionFormValues,
   createWalletActionSchema,
   walletActionTitles,
@@ -25,13 +27,15 @@ const title = computed(() => walletActionTitles[actionType.value]);
 const [BasicForm, formApi] = useVbenForm({
   layout: 'vertical',
   commonConfig: {
+    formItemClass: 'col-span-2',
     labelWidth: 100,
     componentProps: {
       class: 'w-full',
     },
   },
-  schema: createWalletActionSchema('balance'),
+  schema: createWalletActionSchema('balance', handleBalanceDirectionChange),
   showDefaultActions: false,
+  wrapperClass: 'grid-cols-2',
 });
 
 const { onBeforeClose, markInitialized, resetInitialized } = useBeforeCloseDiff(
@@ -60,9 +64,16 @@ const [BasicModal, modalApi] = useVbenModal({
     actionType.value = type;
     // 按操作类型切换表单项（加减款/开关账户等字段不同）
     await formApi.setState({
-      schema: createWalletActionSchema(type),
+      schema: createWalletActionSchema(type, handleBalanceDirectionChange),
     });
     await formApi.setValues(buildWalletActionFormValues(wallet));
+    if (type === 'balance') {
+      // 初始默认加款，自动回填对应 flowType，避免提交空值
+      await formApi.setValues({
+        direction: 'add',
+        flowType: adminAddAmountTypeOptions[0]?.value,
+      });
+    }
     await markInitialized();
 
     modalApi.modalLoading(false);
@@ -78,14 +89,19 @@ async function handleConfirm() {
       return;
     }
     const data = cloneDeep(await formApi.getValues());
-    const result = await memberWalletAction({
-      actionType: actionType.value,
-      ...data,
-    });
-    if (result === 'ok') {
+    if (actionType.value === 'balance') {
+      await memberWalletAddOrSubtract(buildAddOrSubtractPayload(data));
       window.message.success('操作成功');
     } else {
-      window.message.info('钱包操作接口待后端接入，表单校验已通过');
+      const result = await memberWalletAction({
+        actionType: actionType.value,
+        ...data,
+      });
+      if (result === 'ok') {
+        window.message.success('操作成功');
+      } else {
+        window.message.info('钱包操作接口待后端接入，表单校验已通过');
+      }
     }
     resetInitialized();
     emit('reload');
@@ -95,6 +111,26 @@ async function handleConfirm() {
   } finally {
     modalApi.lock(false);
   }
+}
+
+/** 加减款方向切换事件：同步切换可选流水类型默认值 */
+async function handleBalanceDirectionChange(direction: 'add' | 'sub') {
+  const flowType =
+    direction === 'add'
+      ? adminAddAmountTypeOptions[0]?.value
+      : adminSubtractAmountTypeOptions[0]?.value;
+  await formApi.setValues({ direction, flowType });
+}
+
+/** 加减款提交参数（id/type/amount/remark/flowType） */
+function buildAddOrSubtractPayload(data: Record<string, any>) {
+  return {
+    id: data.walletId,
+    type: data.direction === 'add',
+    amount: data.amount,
+    remark: data.remark,
+    flowType: data.flowType,
+  };
 }
 
 async function handleClosed() {
