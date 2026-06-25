@@ -1,4 +1,4 @@
-/** 充值管理列表：筛选 schema 与表格列（字段对齐 FundRechargeItem） */
+/** 充值管理列表：筛选 schema 与表格列（对齐 Java selectPageWithUser） */
 import type { FormSchemaGetter } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
@@ -9,15 +9,17 @@ import { Image, Tag } from 'antdv-next';
 import { renderCopyableValue } from '#/utils/render-copyable';
 
 const statusOptions = [
-  { label: '待审核', value: '0' },
-  { label: '已通过', value: '1' },
-  { label: '已拒绝', value: '2' },
+  { label: '待审核', value: 'PENDING' },
+  { label: '审核中', value: 'REVIEWING' },
+  { label: '已通过', value: 'SUCCESS' },
+  { label: '已取消', value: 'CANCELLED' },
 ];
 
-const statusTagMap: Record<string, { color: string; label: string }> = {
-  '0': { color: 'processing', label: '待审核' },
-  '1': { color: 'success', label: '已通过' },
-  '2': { color: 'error', label: '已拒绝' },
+export const statusTagMap: Record<string, { color: string; label: string }> = {
+  PENDING: { color: 'processing', label: '待审核' },
+  REVIEWING: { color: 'warning', label: '审核中' },
+  SUCCESS: { color: 'success', label: '已通过' },
+  CANCELLED: { color: 'error', label: '已取消' },
 };
 
 export const querySchema: FormSchemaGetter = () => [
@@ -25,7 +27,7 @@ export const querySchema: FormSchemaGetter = () => [
     component: 'Input',
     fieldName: 'keyword',
     componentProps: {
-      placeholder: '用户名/手机号/用户ID',
+      placeholder: '用户名/手机号/订单号',
       class: 'w-[220px]',
     },
     formItemClass: 'pb-0',
@@ -56,19 +58,11 @@ export const querySchema: FormSchemaGetter = () => [
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
   {
-    field: 'userName',
+    field: 'username',
     title: '用户名',
     minWidth: 140,
     slots: {
-      default: ({ row }) => renderCopyableValue(row.userName),
-    },
-  },
-  {
-    field: 'phoneNumber',
-    title: '手机号',
-    minWidth: 120,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+      default: ({ row }) => renderCopyableValue(row.username),
     },
   },
   {
@@ -80,17 +74,59 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'rechargeAmount',
+    field: 'mobile',
+    title: '手机号',
+    minWidth: 120,
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  {
+    field: 'orderNo',
+    title: '订单号',
+    minWidth: 200,
+    showOverflow: 'tooltip',
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  {
+    field: 'amount',
     title: '充值金额',
     minWidth: 110,
     formatter({ cellValue }) {
-      return cellValue ?? '0.00';
+      const num = Number(cellValue ?? 0);
+      return num.toFixed(2);
+    },
+  },
+  {
+    field: 'currency',
+    title: '币种',
+    minWidth: 80,
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  {
+    field: 'targetAccount',
+    title: '目标账户',
+    minWidth: 100,
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  {
+    field: 'paymentMethod',
+    title: '支付方式',
+    minWidth: 100,
+    formatter({ cellValue }) {
+      return cellValue || '-';
     },
   },
   {
     field: 'status',
     title: '状态',
-    minWidth: 90,
+    minWidth: 100,
     slots: {
       default: ({ row }) => {
         const item = statusTagMap[row.status] ?? {
@@ -102,16 +138,16 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'rechargeImage',
+    field: 'screenshot',
     title: '充值截图',
     minWidth: 100,
     slots: {
       default: ({ row }) =>
-        row.rechargeImage ? (
+        row.screenshot ? (
           <Image
             class="rounded object-cover"
             height={32}
-            src={row.rechargeImage}
+            src={row.screenshot}
             width={48}
           />
         ) : (
@@ -128,8 +164,8 @@ export const columns: VxeGridProps['columns'] = [
       return cellValue || '-';
     },
   },
-  { field: 'createTime', title: '创建时间', minWidth: 160 },
-  { field: 'updateTime', title: '更新时间', minWidth: 160 },
+  { field: 'createdAt', title: '创建时间', minWidth: 160 },
+  { field: 'updatedAt', title: '更新时间', minWidth: 160 },
   {
     field: 'action',
     fixed: 'right',
