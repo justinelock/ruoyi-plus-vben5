@@ -1,4 +1,5 @@
 @reference "tailwindcss";
+
 /* antdv-next 组件库的一些样式重置 */
 
 body {
@@ -13,7 +14,10 @@ body {
 .ant-app {
   width: 100%;
   height: 100%;
-  overscroll-behavior: none;
+
+  /* 会导致页面无法滚动 */
+
+  /* overscroll-behavior: none; */
   color: inherit;
 }
 
@@ -27,7 +31,7 @@ body {
 
 /* useVbenForm对错误边框的兼容 */
 .form-valid-error {
-  --vben-form-error-shadow: 0 0 0 2px rgba(255, 35, 5, 0.1);
+  --vben-form-error-shadow: 0 0 0 2px rgb(255 35 5 / 10%);
 
   /*
    * 红色边框:直接覆盖各 outlined 组件「带边框根元素」的 border-color。
@@ -43,6 +47,43 @@ body {
   .ant-select.ant-select-outlined:not(.valid-success) {
     border-color: hsl(var(--destructive)) !important;
   }
+
+  .ant-select-focused .ant-select-selector {
+    box-shadow: var(--vben-form-error-shadow) !important;
+  }
+
+  /** 数字输入框样式 */
+  .ant-input-number-focused {
+    box-shadow: var(--vben-form-error-shadow);
+  }
+
+  .ant-input-number.ant-input-number-mode-input {
+    border-color: hsl(var(--destructive));
+  }
+
+  /** 密码输入框样式 */
+  .ant-input-affix-wrapper:hover {
+    border-color: hsl(var(--destructive));
+    box-shadow: var(--vben-form-error-shadow);
+  }
+
+  .ant-input:not(.valid-success) {
+    border-color: hsl(var(--destructive)) !important;
+  }
+
+  /* select focus-within样式 */
+  .ant-picker-outlined:focus,
+  .ant-picker-outlined:focus-within {
+    border-color: hsl(var(--destructive));
+  }
+
+  /* focus样式 shadow */
+  .ant-select.ant-select-outlined:not(.ant-select-disabled).ant-select-focused {
+    /* --ant-select-active-outline-color: var(--vben-form-error-shadow); */
+    box-shadow: var(--vben-form-error-shadow);
+  }
+
+  /* InputNumber */
 
   /*
    * 聚焦阴影:antd 的 :focus 规则用 var(--ant-*-active-shadow) 画蓝色阴影,
@@ -82,4 +123,25 @@ body {
 
 .dot-before-green {
   @apply before:relative before:top-[-2px] before:mr-[5px] before:inline-block before:size-[6px] before:rounded-full before:content-[''] before:bg-green-500;
+}
+
+/**
+vxe表格右上角toolbar元素之间的间距
+*/
+.vxe-button + .vxe-button.type--button {
+  margin-left: 8px !important;
+}
+
+/**
+vxe默认圆角
+*/
+html {
+  --vxe-ui-border-radius: 8px !important;
+}
+
+/**
+vxe表格loading 只加载表格 不加载上面的表单
+*/
+.vxe-grid.is--loading::before {
+  content: none !important;
 }

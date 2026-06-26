@@ -2,6 +2,7 @@ import type { AxiosRequestConfig } from 'axios';
 
 import { $t } from '@vben/locales';
 
+import { handleUnauthorizedLogout } from './helper';
 import { showAntdMessage } from './popup';
 
 export function checkStatus(
@@ -9,15 +10,17 @@ export function checkStatus(
   msg: string,
   meta: AxiosRequestConfig,
 ): void {
-  let errorMessage = msg;
+  // 401 直接登出，不走下方文案提示
+  if (status === 401) {
+    handleUnauthorizedLogout();
+    return;
+  }
+
+  let errorMessage: string;
 
   switch (status) {
     case 400: {
       errorMessage = $t('ui.fallback.http.badRequest');
-      break;
-    }
-    case 401: {
-      errorMessage = $t('ui.fallback.http.unauthorized');
       break;
     }
     case 403: {
@@ -33,7 +36,7 @@ export function checkStatus(
       break;
     }
     default: {
-      errorMessage = $t('ui.fallback.http.internalServerError');
+      errorMessage = msg || $t('ui.fallback.http.internalServerError');
     }
   }
 

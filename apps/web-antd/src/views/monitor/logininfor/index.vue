@@ -80,7 +80,7 @@ const [BasicTable, tableApi] = useVbenVxeGrid({
   gridEvents: {
     checkboxChange: (e) => {
       const records = e.$grid?.getCheckboxRecords?.() ?? [];
-      canUnlock.value = records.length === 1 && records[0]!.status === '1';
+      canUnlock.value = records.length === 1 && records[0]?.status === '1';
     },
   },
 });
@@ -184,7 +184,7 @@ async function handleExport() {
         </Space>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button @click.stop="handlePreview(row)">
             {{ $t('pages.common.info') }}
           </action-button>
@@ -201,7 +201,7 @@ async function handleExport() {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <LoginInfoModal />

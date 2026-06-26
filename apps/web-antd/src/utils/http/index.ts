@@ -189,7 +189,10 @@ const alovaInstance = createAlova({
          * 我建议你改后端而不是前端来做兼容
          */
         // json数据的判断
-        if (response.headers['content-type']?.includes?.('application/json')) {
+        const rawContentType = response.headers['content-type'];
+        const contentType =
+          typeof rawContentType === 'string' ? rawContentType : '';
+        if (contentType.includes('application/json')) {
           /**
            * 需要判断是否登录超时/401
            * 执行登出操作
@@ -316,7 +319,7 @@ const alovaInstance = createAlova({
           return Promise.reject(error);
         }
       } catch (error) {
-        throw new Error(error as unknown as string);
+        throw new Error(error as unknown as string, { cause: error });
       }
 
       const msg: string = (response?.data as any)?.msg ?? '';

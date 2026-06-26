@@ -160,6 +160,10 @@ const formSchema = computed((): VbenFormSchema[] => {
 async function handleAccountLogin(values: LoginAndRegisterParams) {
   try {
     const requestParam: any = omit(values, ['code']);
+    // 未开启租户时表单项被隐藏，需补默认租户 ID
+    if (!requestParam.tenantId) {
+      requestParam.tenantId = DEFAULT_TENANT_ID;
+    }
     // 验证码
     if (captchaInfo.value.captchaEnabled) {
       requestParam.code = values.code;

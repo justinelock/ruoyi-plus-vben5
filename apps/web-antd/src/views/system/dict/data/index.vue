@@ -172,7 +172,7 @@ onBeforeUnmount(() => {
         </Space>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['system:dict:edit']"
             @click="handleEdit(row)"
@@ -194,7 +194,7 @@ onBeforeUnmount(() => {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <DictDataDrawer @reload="tableApi.query()" />

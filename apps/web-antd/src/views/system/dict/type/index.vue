@@ -175,7 +175,7 @@ async function handleExport() {
         </Space>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['system:dict:edit']"
             @click.stop="handleEdit(row)"
@@ -195,7 +195,7 @@ async function handleExport() {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <DictTypeModal @reload="tableApi.query()" />

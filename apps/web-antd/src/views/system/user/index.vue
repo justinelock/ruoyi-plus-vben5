@@ -285,7 +285,7 @@ function handleDeptReload() {
         </template>
         <template #action="{ row }">
           <template v-if="row.userId !== SUPERADMIN_USER_ID">
-            <Space>
+            <table-action-space>
               <action-button
                 v-access:code="['system:user:edit']"
                 @click.stop="handleEdit(row)"
@@ -305,18 +305,19 @@ function handleDeptReload() {
                   {{ $t('pages.common.delete') }}
                 </action-button>
               </Popconfirm>
-            </Space>
-            <Dropdown
-              placement="bottomRight"
-              :menu="{
-                items: menuItems,
-                onClick: (info) => handleMenuClick(info.key, row),
-              }"
-            >
-              <a-button size="small" type="link">
-                {{ $t('pages.common.more') }}
-              </a-button>
-            </Dropdown>
+
+              <Dropdown
+                placement="bottomRight"
+                :menu="{
+                  items: menuItems,
+                  onClick: (info) => handleMenuClick(info.key, row),
+                }"
+              >
+                <a-button size="small" type="link">
+                  {{ $t('pages.common.more') }}
+                </a-button>
+              </Dropdown>
+            </table-action-space>
           </template>
         </template>
       </BasicTable>

@@ -6,6 +6,16 @@ interface AnalysisOverviewItem {
   totalTitle: string;
   totalValue: number;
   value: number;
+  /** 数字强调色：充值 success(绿)、提现 danger(红) */
+  valueTone?: 'danger' | 'default' | 'success';
+  /** 主数字前缀 */
+  valuePrefix?: string;
+  /** 底部数值前缀 */
+  totalValuePrefix?: string;
+  /** 主数字小数位，默认 0 */
+  valueDecimals?: number;
+  /** 底部数值小数位，金额类常用 2 */
+  totalValueDecimals?: number;
 }
 
 interface WorkbenchProjectItem {

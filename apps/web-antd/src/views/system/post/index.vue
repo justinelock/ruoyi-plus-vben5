@@ -173,7 +173,7 @@ function handleDeptSelect(keys: string[]) {
         </Space>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['system:post:edit']"
             @click="handleEdit(row)"
@@ -193,7 +193,7 @@ function handleDeptSelect(keys: string[]) {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <PostDrawer @reload="tableApi.query()" />

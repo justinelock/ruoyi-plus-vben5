@@ -21,12 +21,14 @@ export default defineConfig(async () => {
         // }),
       ],
       server: {
+        // ngrok 等外网隧道：允许对应 Host，否则 Vite 会拦截请求
+        allowedHosts: ['.ngrok-free.dev', '.ngrok.io', '.ngrok.app'],
         proxy: {
+          // 统一走 Traefik 网关（勿直连 8091/8092）；业务路由见 bin/traefik/dynamic.yaml
           '/api': {
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api/, ''),
-            // mock代理目标地址
-            target: 'http://localhost:8080',
+            target: 'http://127.0.0.1:28080',
             ws: true,
           },
         },

@@ -117,7 +117,7 @@ function collapseAll() {
         </Space>
       </template>
       <template #action="{ row }">
-        <Space>
+        <table-action-space>
           <action-button
             v-access:code="['system:tree:edit']"
             @click.stop="handleEdit(row)"
@@ -138,7 +138,7 @@ function collapseAll() {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        </Space>
+        </table-action-space>
       </template>
     </BasicTable>
     <TreeModal @reload="tableApi.query()" />
