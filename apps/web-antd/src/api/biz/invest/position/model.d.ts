@@ -1,27 +1,68 @@
 export interface InvestPosition {
   id: string;
-  userName: string;
-  realName: string;
-  investCode: string;
-  positionAmount: string;
-  buyDate: string;
-  startDate: string;
-  endDate: string;
-  periodDays: string;
-  fixedYieldRate: string;
-  positionStatus: string;
-  endStatus: string;
-  lastProfitDate: string;
-  createTime: string;
-  updateTime: string;
+  userId?: string;
+  username?: string;
+  mobile?: string;
+  realName?: string;
+  fundCode?: string;
+  fundName?: string;
+  amount?: number;
+  buyDate?: string;
+  startDate?: string;
+  endDate?: string;
+  period?: number;
+  rate?: number;
+  profit?: number;
+  state?: string;
+  status?: number;
+  lastProfitDate?: string;
+  createTime?: string;
+  updateTime?: string;
 }
 
 export interface InvestPositionQuery {
   pageNum?: number;
   pageSize?: number;
   keyword?: string;
-  investCode?: string;
-  positionStatus?: string;
+  fundCode?: string;
+  status?: string;
   createTime?: string[];
   [key: string]: any;
+}
+
+export interface InvestPositionOrder {
+  id: string;
+  userId?: string;
+  positionId?: string;
+  orderId?: string;
+  fundCode?: string;
+  profitDate?: string;
+  profitDatetime?: string;
+  profit?: number;
+  cumulativeProfit?: number;
+  status?: number;
+  createTime?: string;
+  updateTime?: string;
+}
+
+export interface InvestPositionOrderQuery {
+  pageNum?: number;
+  pageSize?: number;
+  userId: string;
+  positionId: string;
+}
+
+export interface InvestPositionProfitBeforeReq {
+  id: string;
+  profitDate: string;
+}
+
+export interface InvestPositionProfitBeforeResp {
+  profit: number | null;
+}
+
+export interface InvestPositionUpdateProfitReq {
+  id: string;
+  profitDate: string;
+  profit: number;
 }

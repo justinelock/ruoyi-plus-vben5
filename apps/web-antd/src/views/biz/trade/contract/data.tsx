@@ -35,11 +35,31 @@ const directionLabel: Record<number, string> = {
   2: '卖出做空',
 };
 
+/** 方向列颜色：买入红、卖出绿（红涨绿跌） */
+function directionTextClass(direction?: number | string | null) {
+  const value = Number(direction);
+  if (value === 1) {
+    return 'text-[#ff4d4f]';
+  }
+  if (value === 2) {
+    return 'text-[#52c41a]';
+  }
+  return '';
+}
+
 const controlTypeLabel: Record<number, string> = {
   1: '必赢',
   2: '必输',
   3: '自然',
 };
+
+/** 订单控单列文案：0/空为未控单，3 为自然（对齐 Java ControlType） */
+function formatControlType(value?: number | null) {
+  if (value === undefined || value === null || value === 0) {
+    return '未控单';
+  }
+  return controlTypeLabel[value] ?? String(value);
+}
 
 const controlResultLabel: Record<number, string> = {
   1: '赢',
@@ -143,8 +163,14 @@ export const columns: VxeGridProps['columns'] = [
     field: 'direction',
     title: '方向',
     minWidth: 100,
-    formatter({ cellValue }) {
-      return directionLabel[cellValue as number] ?? '-';
+    slots: {
+      default: ({ row }) => {
+        const text = directionLabel[Number(row.direction)] ?? '-';
+        if (text === '-') {
+          return text;
+        }
+        return <span class={directionTextClass(row.direction)}>{text}</span>;
+      },
     },
   },
   {
@@ -159,8 +185,19 @@ export const columns: VxeGridProps['columns'] = [
     field: 'actualProfit',
     title: '实际收益',
     minWidth: 100,
-    formatter({ cellValue }) {
-      return formatAmount(cellValue);
+    slots: {
+      default: ({ row }) => {
+        const value = row.actualProfit;
+        if (value === undefined || value === null) {
+          return '-';
+        }
+        const amount = Number(value);
+        const text = formatAmount(amount);
+        // 正收益绿、负收益红、零为默认色（对齐资金流水变动金额列）
+        const color =
+          amount > 0 ? 'text-[#52c41a]' : amount < 0 ? 'text-[#ff4d4f]' : '';
+        return <span class={color}>{text}</span>;
+      },
     },
   },
   {
@@ -199,10 +236,7 @@ export const columns: VxeGridProps['columns'] = [
     title: '订单控单',
     minWidth: 90,
     formatter({ cellValue }) {
-      if (cellValue === undefined || cellValue === null) {
-        return '-';
-      }
-      return controlTypeLabel[cellValue as number] ?? String(cellValue);
+      return formatControlType(cellValue as number | null | undefined);
     },
   },
   {

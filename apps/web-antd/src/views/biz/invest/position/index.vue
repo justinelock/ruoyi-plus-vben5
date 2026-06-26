@@ -4,24 +4,22 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { InvestPosition } from '#/api/biz/invest/position/model';
 
-import { Page } from '@vben/common-ui';
-
-import { Space } from 'antdv-next';
+import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { investPositionList } from '#/api/biz/invest/position';
 
 import { bizInlineFormBase, bizTimeMapping } from '../../shared/form-options';
 import { columns, querySchema } from './data';
+import PositionProfitOrderDrawer from './position-profit-order-drawer.vue';
+import PositionUpdateProfitModal from './position-update-profit-modal.vue';
 
-// 1. 单行 inline 筛选 + createTime 时间范围映射（对接 GET /invest/position/list）
 const formOptions: VbenFormProps = {
   ...bizInlineFormBase,
   schema: querySchema(),
   fieldMappingTime: [bizTimeMapping('createTime')],
 };
 
-// 2. 分页表格
 const gridOptions: VxeGridProps = {
   checkboxConfig: { highlight: true, reserve: true, trigger: 'default' },
   columns,
@@ -44,9 +42,32 @@ const gridOptions: VxeGridProps = {
   id: 'invest-position-index',
 };
 
-const [BasicTable] = useVbenVxeGrid({ formOptions, gridOptions });
+const [BasicTable, tableApi] = useVbenVxeGrid({ formOptions, gridOptions });
 
-function handleView(_row: InvestPosition) {}
+const [ProfitOrderDrawer, profitOrderDrawerApi] = useVbenDrawer({
+  connectedComponent: PositionProfitOrderDrawer,
+});
+
+const [UpdateProfitModal, updateProfitModalApi] = useVbenModal({
+  connectedComponent: PositionUpdateProfitModal,
+});
+
+/** 打开收益订单抽屉，传入 userId + positionId 查 fb_fund_profit_log */
+function handleProfitOrders(row: InvestPosition) {
+  profitOrderDrawerApi.setData({
+    userId: row.userId,
+    positionId: row.id,
+    username: row.username,
+    realName: row.realName,
+  });
+  profitOrderDrawerApi.open();
+}
+
+/** 打开修改收益弹窗，选日期后查 profitBefore 再提交 */
+function handleUpdateProfit(row: InvestPosition) {
+  updateProfitModalApi.setData(row);
+  updateProfitModalApi.open();
+}
 
 function handleExport() {}
 </script>
@@ -67,12 +88,20 @@ function handleExport() {}
         <table-action-space>
           <action-button
             v-access:code="['invest:position:list']"
-            @click.stop="handleView(row)"
+            @click.stop="handleProfitOrders(row)"
           >
-            详情
+            收益订单
+          </action-button>
+          <action-button
+            v-access:code="['invest:position:list']"
+            @click.stop="handleUpdateProfit(row)"
+          >
+            修改收益
           </action-button>
         </table-action-space>
       </template>
     </BasicTable>
+    <ProfitOrderDrawer />
+    <UpdateProfitModal @reload="tableApi.reload" />
   </Page>
 </template>
