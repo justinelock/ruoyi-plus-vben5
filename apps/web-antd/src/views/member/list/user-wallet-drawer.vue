@@ -24,7 +24,10 @@ const [WalletActionModalComp, walletActionModalApi] = useVbenModal({
 });
 
 /** 打开合并操作弹窗（±款、开/关账户等单按钮入口） */
-function handleOpenWalletAction(actionType: WalletActionType, row: MemberWallet) {
+function handleOpenWalletAction(
+  actionType: WalletActionType,
+  row: MemberWallet,
+) {
   walletActionModalApi.setData({ actionType, wallet: row });
   walletActionModalApi.open();
 }
@@ -85,7 +88,8 @@ const [BasicDrawer, drawerApi] = useVbenDrawer({
       // 用户列表点击余额后透传 userId；username 作为 keyword 兼容旧查询口径
       filterUserId.value = userId || '';
       filterKeyword.value = username || '';
-      drawerTitle.value = realName || username ? `${realName || username}的钱包` : '用户钱包';
+      drawerTitle.value =
+        realName || username ? `${realName || username}的钱包` : '用户钱包';
       await loadWalletRows();
     } else {
       filterUserId.value = '';

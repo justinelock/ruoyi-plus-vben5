@@ -22,7 +22,10 @@ const agentLevelOptions = [
   { label: '五级（含五级）', value: 5 },
 ];
 
-const radioButton = { buttonStyle: 'solid' as const, optionType: 'button' as const };
+const radioButton = {
+  buttonStyle: 'solid' as const,
+  optionType: 'button' as const,
+};
 
 const [BasicModal, modalApi] = useVbenModal({
   onClosed: handleClosed,

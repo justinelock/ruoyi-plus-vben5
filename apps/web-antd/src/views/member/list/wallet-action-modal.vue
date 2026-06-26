@@ -7,7 +7,10 @@ import { useVbenModal } from '@vben/common-ui';
 import { cloneDeep } from '@vben/utils';
 
 import { useVbenForm } from '#/adapter/form';
-import { memberWalletAction, memberWalletAddOrSubtract } from '#/api/member/wallet';
+import {
+  memberWalletAction,
+  memberWalletAddOrSubtract,
+} from '#/api/member/wallet';
 import { defaultFormValueGetter, useBeforeCloseDiff } from '#/utils/popup';
 
 import {

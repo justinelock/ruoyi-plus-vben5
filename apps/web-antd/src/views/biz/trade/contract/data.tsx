@@ -1,7 +1,5 @@
 /** 合约订单列表：筛选 schema 与表格列（对齐 Java getPageData / FbContractOrdersVO） */
-import type {
-  TradeContractSettlementLog,
-} from '#/api/biz/trade/contract/model';
+import type { TradeContractSettlementLog } from '#/api/biz/trade/contract/model';
 
 import type { FormSchemaGetter } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
@@ -77,7 +75,9 @@ function formatPrice(value?: number | null) {
   if (value === undefined || value === null) {
     return '-';
   }
-  return Number(value).toFixed(8).replace(/\.?0+$/, '');
+  return Number(value)
+    .toFixed(8)
+    .replace(/\.?0+$/, '');
 }
 
 export const querySchema: FormSchemaGetter = () => [

@@ -10,7 +10,10 @@ import { alovaInstance } from '#/utils/http';
  * @see GET /product/history/list
  */
 export function productHistoryList(params?: ProductHistoryQuery) {
-  return alovaInstance.get<PageResult<ProductHistory>>('/product/history/list', {
-    params,
-  });
+  return alovaInstance.get<PageResult<ProductHistory>>(
+    '/product/history/list',
+    {
+      params,
+    },
+  );
 }

@@ -1,6 +1,9 @@
 import type { FormSchemaGetter } from '#/adapter/form';
 
-const radioButton = { buttonStyle: 'solid' as const, optionType: 'button' as const };
+const radioButton = {
+  buttonStyle: 'solid' as const,
+  optionType: 'button' as const,
+};
 
 /** 实名认证状态 */
 export const memberVerificationStatusOptions = [

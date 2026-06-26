@@ -117,7 +117,9 @@ export function createWalletActionSchema(
             buttonStyle: 'solid',
             onChange: (event: any) => {
               const direction =
-                event?.target?.value === 'sub' || event === 'sub' ? 'sub' : 'add';
+                event?.target?.value === 'sub' || event === 'sub'
+                  ? 'sub'
+                  : 'add';
               onBalanceDirectionChange?.(direction);
             },
             optionType: 'button',
@@ -139,7 +141,8 @@ export function createWalletActionSchema(
             optionType: 'button',
           },
           dependencies: {
-            show: ({ direction }: Record<string, string>) => direction === 'add',
+            show: ({ direction }: Record<string, string>) =>
+              direction === 'add',
             triggerFields: ['direction'],
           },
           fieldName: 'flowType',
@@ -154,7 +157,8 @@ export function createWalletActionSchema(
             optionType: 'button',
           },
           dependencies: {
-            show: ({ direction }: Record<string, string>) => direction === 'sub',
+            show: ({ direction }: Record<string, string>) =>
+              direction === 'sub',
             triggerFields: ['direction'],
           },
           fieldName: 'flowType',
@@ -315,7 +319,8 @@ export function buildWalletActionFormValues(wallet: {
     walletId: wallet.id,
     accountType: accountTypeLabelMap[accountType] ?? accountType,
     currency: wallet.currency || '-',
-    balance: wallet.balance === undefined ? '0.00' : Number(wallet.balance).toFixed(2),
+    balance:
+      wallet.balance === undefined ? '0.00' : Number(wallet.balance).toFixed(2),
     frozenAmount:
       wallet.frozenAmount === undefined
         ? '0.00'

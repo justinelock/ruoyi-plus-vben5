@@ -57,7 +57,11 @@ export function resolvePosterSrc(poster?: string) {
   if (!p) {
     return '';
   }
-  if (p.startsWith('http://') || p.startsWith('https://') || p.startsWith('data:')) {
+  if (
+    p.startsWith('http://') ||
+    p.startsWith('https://') ||
+    p.startsWith('data:')
+  ) {
     return p;
   }
   if (p.startsWith('/')) {

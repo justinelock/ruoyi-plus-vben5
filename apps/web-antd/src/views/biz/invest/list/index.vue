@@ -94,7 +94,9 @@ const showBatchDelete = false;
           title="确认删除所选投信？"
           @confirm="handleBatchDelete"
         >
-          <a-button v-access:code="['invest:list:list']" danger>批量删除</a-button>
+          <a-button v-access:code="['invest:list:list']" danger
+            >批量删除</a-button
+          >
         </Popconfirm>
       </template>
       <template #action="{ row }">

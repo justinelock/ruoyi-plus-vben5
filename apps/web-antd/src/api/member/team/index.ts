@@ -66,7 +66,10 @@ export function memberTeamMembers(
  * @see PUT /member/team/changeParent
  */
 export function memberTeamChangeParent(data: MemberTeamChangeParentParam) {
-  return alovaInstance.put<MemberTeamChangeParentResult>(Api.changeParent, data);
+  return alovaInstance.put<MemberTeamChangeParentResult>(
+    Api.changeParent,
+    data,
+  );
 }
 
 /**

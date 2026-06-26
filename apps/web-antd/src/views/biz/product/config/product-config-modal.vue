@@ -1,8 +1,6 @@
 <script setup lang="ts">
 /** 产品配置新增/编辑弹窗（对齐 Java fbfundproduct-add-or-update.vue） */
-import type {
-  ProductConfigSaveReq,
-} from '#/api/biz/product/config/model';
+import type { ProductConfigSaveReq } from '#/api/biz/product/config/model';
 
 import { computed, ref, watch } from 'vue';
 

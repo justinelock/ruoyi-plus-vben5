@@ -1,8 +1,4 @@
-import type {
-  InvestList,
-  InvestListQuery,
-  InvestListSaveReq,
-} from './model';
+import type { InvestList, InvestListQuery, InvestListSaveReq } from './model';
 
 import type { PageResult } from '#/api/common';
 

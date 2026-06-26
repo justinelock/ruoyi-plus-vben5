@@ -1,7 +1,4 @@
-import type {
-  DashboardStatistics,
-  DashboardStatisticsType,
-} from './model';
+import type { DashboardStatistics, DashboardStatisticsType } from './model';
 
 import { alovaInstance } from '#/utils/http';
 

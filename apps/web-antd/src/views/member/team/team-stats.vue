@@ -18,7 +18,12 @@ const cards: Array<{
   { key: 'level4Members', label: '四级代理', tone: 'level4' },
   { key: 'level5Members', label: '五级代理', tone: 'level5' },
   { key: 'totalMembers', label: '团队成员总数', tone: 'members' },
-  { key: 'totalTeamBalance', label: '团队总余额', tone: 'balance', money: true },
+  {
+    key: 'totalTeamBalance',
+    label: '团队总余额',
+    tone: 'balance',
+    money: true,
+  },
 ];
 </script>
 

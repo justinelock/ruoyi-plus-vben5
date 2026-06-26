@@ -20,9 +20,7 @@ export function CopyIcon({ onClick }: { onClick: (e: MouseEvent) => void }) {
 /** 表格单元格：文本 + 复制图标（与用户列表用户名列一致） */
 export function renderCopyableValue(value?: null | number | string) {
   const text =
-    value === null || value === undefined || value === ''
-      ? '-'
-      : String(value);
+    value === null || value === undefined || value === '' ? '-' : String(value);
   return (
     <span class="inline-flex items-center gap-1">
       <span>{text}</span>

@@ -141,8 +141,7 @@ export const columns: VxeGridProps['columns'] = [
     title: '起止日期',
     minWidth: 200,
     slots: {
-      default: ({ row }) =>
-        `${row.startDate || '-'} ~ ${row.endDate || '-'}`,
+      default: ({ row }) => `${row.startDate || '-'} ~ ${row.endDate || '-'}`,
     },
   },
   {

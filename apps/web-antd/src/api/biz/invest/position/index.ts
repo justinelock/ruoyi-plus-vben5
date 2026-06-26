@@ -29,7 +29,9 @@ export function investPositionOrderList(params: InvestPositionOrderQuery) {
 }
 
 /** 查询修改前收益；无流水时 profit 为 null */
-export function investPositionProfitBefore(data: InvestPositionProfitBeforeReq) {
+export function investPositionProfitBefore(
+  data: InvestPositionProfitBeforeReq,
+) {
   return alovaInstance.post<InvestPositionProfitBeforeResp>(
     '/invest/position/profit/before',
     data,
@@ -37,6 +39,8 @@ export function investPositionProfitBefore(data: InvestPositionProfitBeforeReq) 
 }
 
 /** 修改持仓某日收益 */
-export function investPositionUpdateProfit(data: InvestPositionUpdateProfitReq) {
+export function investPositionUpdateProfit(
+  data: InvestPositionUpdateProfitReq,
+) {
   return alovaInstance.putWithMsg<void>('/invest/position/profit', data);
 }

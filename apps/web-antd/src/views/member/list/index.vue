@@ -223,18 +223,18 @@ function handleMenuClick(key: string, row: MemberUser) {
               {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
-        
-        <Dropdown
-          placement="bottomRight"
-          :menu="{
-            items: menuItems,
-            onClick: (info) => handleMenuClick(String(info.key), row),
-          }"
-        >
-          <a-button size="small" type="link">
-            {{ $t('pages.common.more') }}
-          </a-button>
-        </Dropdown>
+
+          <Dropdown
+            placement="bottomRight"
+            :menu="{
+              items: menuItems,
+              onClick: (info) => handleMenuClick(String(info.key), row),
+            }"
+          >
+            <a-button size="small" type="link">
+              {{ $t('pages.common.more') }}
+            </a-button>
+          </Dropdown>
         </table-action-space>
       </template>
     </BasicTable>

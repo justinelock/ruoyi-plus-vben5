@@ -138,14 +138,13 @@ function handleExport() {}
             @confirm="handleBatchDirectional(item.controlState)"
           >
             <template #title>
-              <div class="max-w-[300px] whitespace-normal text-left leading-relaxed">
+              <div
+                class="max-w-[300px] whitespace-normal text-left leading-relaxed"
+              >
                 {{ item.title }}
               </div>
             </template>
-            <a-button
-              v-access:code="['trade:contract:list']"
-              @click.stop=""
-            >
+            <a-button v-access:code="['trade:contract:list']" @click.stop="">
               {{ item.label }}
             </a-button>
           </Popconfirm>
@@ -154,9 +153,9 @@ function handleExport() {}
       <template #action="{ row }">
         <table-action-space
           v-if="
-            canContractShowSettlementLog(row)
-              || canContractWinLose(row)
-              || canContractChangeDirection(row)
+            canContractShowSettlementLog(row) ||
+            canContractWinLose(row) ||
+            canContractChangeDirection(row)
           "
         >
           <action-button

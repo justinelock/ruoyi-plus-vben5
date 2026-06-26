@@ -111,10 +111,7 @@ async function handleRestore(row: MemberUser) {
             title="确认恢复该用户？"
             @confirm="handleRestore(row)"
           >
-            <action-button
-              v-access:code="['member:list:list']"
-              @click.stop=""
-            >
+            <action-button v-access:code="['member:list:list']" @click.stop="">
               恢复
             </action-button>
           </Popconfirm>

@@ -40,14 +40,13 @@ function mainValueClass(item: AnalysisOverviewItem) {
 
 /** 底部数字样式：金额行可与主数字分色（提现仅底部红色） */
 function footerValueClass(item: AnalysisOverviewItem) {
-  const tone =
-    item.totalValuePrefix?.startsWith('-')
-      ? 'text-red-500'
-      : item.valueTone === 'success'
-        ? 'text-green-600'
-        : item.valueTone === 'danger'
-          ? 'text-red-500'
-          : '';
+  const tone = item.totalValuePrefix?.startsWith('-')
+    ? 'text-red-500'
+    : item.valueTone === 'success'
+      ? 'text-green-600'
+      : item.valueTone === 'danger'
+        ? 'text-red-500'
+        : '';
   return ['font-bold', tone].filter(Boolean).join(' ');
 }
 </script>

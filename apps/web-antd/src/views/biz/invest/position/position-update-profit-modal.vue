@@ -139,7 +139,11 @@ async function handleSubmit() {
   const profit = values.profit as number | undefined;
 
   // 修改前、修改后收益均不能为空（与产品规则一致）
-  if (!hasProfitBefore.value || profitBefore === undefined || profitBefore === null) {
+  if (
+    !hasProfitBefore.value ||
+    profitBefore === undefined ||
+    profitBefore === null
+  ) {
     message.error('修改前收益不能为空，请先选择有收益记录的日期');
     return;
   }

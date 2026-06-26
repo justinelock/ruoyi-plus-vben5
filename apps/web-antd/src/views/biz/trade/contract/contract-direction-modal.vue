@@ -83,7 +83,10 @@ async function handleSubmit() {
   const values = await formApi.getValues();
   modalApi.modalLoading(true);
   try {
-    await tradeContractDirection(values.id as string, values.direction as number);
+    await tradeContractDirection(
+      values.id as string,
+      values.direction as number,
+    );
     emit('reload');
     modalApi.close();
   } finally {

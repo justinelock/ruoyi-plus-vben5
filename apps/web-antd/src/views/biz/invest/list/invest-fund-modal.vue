@@ -1,6 +1,9 @@
 <script setup lang="ts">
 /** 投信新增/编辑弹窗：字段对齐 Java fbfund-add-or-update，海报 base64 提交由后端落盘 */
-import type { InvestList, InvestListSaveReq } from '#/api/biz/invest/list/model';
+import type {
+  InvestList,
+  InvestListSaveReq,
+} from '#/api/biz/invest/list/model';
 
 import { computed, ref } from 'vue';
 
@@ -24,9 +27,7 @@ const editingId = ref('');
 const posterPreview = ref('');
 const posterFileInputRef = ref<HTMLInputElement | null>(null);
 
-const modalTitle = computed(() =>
-  editingId.value ? '修改投信' : '新增投信',
-);
+const modalTitle = computed(() => (editingId.value ? '修改投信' : '新增投信'));
 
 const hasPosterPreview = computed(() => !!posterPreview.value.trim());
 
@@ -102,8 +103,10 @@ async function applyDetail(detail: InvestList) {
     price: detail.price ?? 0,
     currency: detail.currency || 'USD',
     description: detail.description ?? '',
-    rateMinPct: detail.rateMin != null ? decimalToPercent(detail.rateMin) : undefined,
-    rateMaxPct: detail.rateMax != null ? decimalToPercent(detail.rateMax) : undefined,
+    rateMinPct:
+      detail.rateMin != null ? decimalToPercent(detail.rateMin) : undefined,
+    rateMaxPct:
+      detail.rateMax != null ? decimalToPercent(detail.rateMax) : undefined,
     ratePct: detail.rate != null ? decimalToPercent(detail.rate) : undefined,
     minAmount: detail.minAmount ?? 0,
     maxAmount: detail.maxAmount ?? 0,
@@ -230,7 +233,9 @@ async function handleSubmit() {
           @change="handlePosterFileUpload"
         />
         <div class="text-sm font-medium text-gray-800">点击上传投信海报</div>
-        <div class="mt-1 text-xs text-gray-500">支持 JPG、PNG、JPEG，最大 5MB</div>
+        <div class="mt-1 text-xs text-gray-500">
+          支持 JPG、PNG、JPEG，最大 5MB
+        </div>
       </div>
     </div>
     <BasicForm />

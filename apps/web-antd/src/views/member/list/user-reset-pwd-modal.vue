@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { DescriptionsProps } from 'antdv-next';
 
-import type { MemberUser, MemberUserResetPwdParam } from '#/api/member/user/model';
+import type {
+  MemberUser,
+  MemberUserResetPwdParam,
+} from '#/api/member/user/model';
 
 import { computed, ref } from 'vue';
 
