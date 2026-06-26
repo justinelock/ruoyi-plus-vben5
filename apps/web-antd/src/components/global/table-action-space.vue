@@ -3,7 +3,7 @@ import { Space } from 'antdv-next';
 
 defineOptions({ name: 'TableActionSpace' });
 
-/** 表格操作列按钮容器：间距 2px */
+/** 表格操作列按钮容器：与 ActionButton 配合，项间距 4px */
 withDefaults(
   defineProps<{
     wrap?: boolean;
@@ -13,7 +13,7 @@ withDefaults(
 </script>
 
 <template>
-  <Space :size="2" :wrap="wrap">
+  <Space :size="4" :wrap="wrap">
     <slot />
   </Space>
 </template>

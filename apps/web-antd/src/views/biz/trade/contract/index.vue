@@ -4,24 +4,40 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { TradeContract } from '#/api/biz/trade/contract/model';
 
-import { Page } from '@vben/common-ui';
+import { ref } from 'vue';
 
-import { Space } from 'antdv-next';
+import { Page, useVbenModal } from '@vben/common-ui';
+
+import { Popconfirm } from 'antdv-next';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { tradeContractList } from '#/api/biz/trade/contract';
+import {
+  tradeContractBatchCurrentPageDirectional,
+  tradeContractList,
+  tradeContractLose,
+  tradeContractWin,
+} from '#/api/biz/trade/contract';
 
 import { bizInlineFormBase, bizTimeMapping } from '../../shared/form-options';
-import { columns, querySchema } from './data';
+import ContractDirectionModal from './contract-direction-modal.vue';
+import ContractSettlementLogModal from './contract-settlement-log-modal.vue';
+import {
+  batchDirectionalActions,
+  canContractChangeDirection,
+  canContractShowSettlementLog,
+  canContractWinLose,
+  columns,
+  querySchema,
+} from './data';
 
-// 1. 单行 inline 筛选 + openTime 时间范围映射（对接 GET /trade/contract/list）
 const formOptions: VbenFormProps = {
   ...bizInlineFormBase,
   schema: querySchema(),
-  fieldMappingTime: [bizTimeMapping('openTime')],
+  fieldMappingTime: [bizTimeMapping('createTime')],
 };
 
-// 2. 分页表格
+const lastListQuery = ref<Record<string, unknown>>({});
+
 const gridOptions: VxeGridProps = {
   checkboxConfig: { highlight: true, reserve: true, trigger: 'default' },
   columns,
@@ -30,12 +46,15 @@ const gridOptions: VxeGridProps = {
   pagerConfig: {},
   proxyConfig: {
     ajax: {
-      query: async ({ page }, formValues = {}) =>
-        tradeContractList({
+      query: async ({ page }, formValues = {}) => {
+        const params = {
           pageNum: page.currentPage,
           pageSize: page.pageSize,
           ...formValues,
-        }),
+        };
+        lastListQuery.value = params;
+        return tradeContractList(params);
+      },
     },
   },
   headerCellConfig: { height: 44 },
@@ -44,15 +63,57 @@ const gridOptions: VxeGridProps = {
   id: 'trade-contract-index',
 };
 
-const [BasicTable] = useVbenVxeGrid({ formOptions, gridOptions });
+const [BasicTable, tableApi] = useVbenVxeGrid({ formOptions, gridOptions });
 
-function handleView(_row: TradeContract) {
-  // 详情待业务接口就绪后接入
+const [DirectionModal, directionModalApi] = useVbenModal({
+  connectedComponent: ContractDirectionModal,
+});
+
+const [SettlementLogModal, settlementLogModalApi] = useVbenModal({
+  connectedComponent: ContractSettlementLogModal,
+});
+
+async function handleWin(row: TradeContract) {
+  await tradeContractWin(row.id);
+  await tableApi.query();
 }
 
-function handleExport() {
-  // 导出待业务接口就绪后接入
+async function handleLose(row: TradeContract) {
+  await tradeContractLose(row.id);
+  await tableApi.query();
 }
+
+function handleOpenDirection(row: TradeContract) {
+  directionModalApi.setData(row);
+  directionModalApi.open();
+}
+
+function handleOpenSettlementLog(row: TradeContract) {
+  settlementLogModalApi.setData(row);
+  settlementLogModalApi.open();
+}
+
+function buildBatchPayload(controlState: string) {
+  const q = lastListQuery.value;
+  return {
+    pageNum: q.pageNum as number | undefined,
+    pageSize: q.pageSize as number | undefined,
+    keyword: q.keyword as string | undefined,
+    status: q.status as string | undefined,
+    beginTime: q['params[beginTime]'] as string | undefined,
+    endTime: q['params[endTime]'] as string | undefined,
+    controlState,
+  };
+}
+
+async function handleBatchDirectional(controlState: string) {
+  await tradeContractBatchCurrentPageDirectional(
+    buildBatchPayload(controlState),
+  );
+  await tableApi.query();
+}
+
+function handleExport() {}
 </script>
 
 <template>
@@ -67,16 +128,82 @@ function handleExport() {
           导出
         </a-button>
       </template>
-      <template #action="{ row }">
+      <template #toolbar-tools>
         <table-action-space>
-          <action-button
-            v-access:code="['trade:contract:list']"
-            @click.stop="handleView(row)"
+          <Popconfirm
+            v-for="item in batchDirectionalActions"
+            :key="item.controlState"
+            placement="bottom"
+            :overlay-inner-style="{ maxWidth: '320px' }"
+            @confirm="handleBatchDirectional(item.controlState)"
           >
-            详情
+            <template #title>
+              <div class="max-w-[300px] whitespace-normal text-left leading-relaxed">
+                {{ item.title }}
+              </div>
+            </template>
+            <a-button
+              v-access:code="['trade:contract:list']"
+              @click.stop=""
+            >
+              {{ item.label }}
+            </a-button>
+          </Popconfirm>
+        </table-action-space>
+      </template>
+      <template #action="{ row }">
+        <table-action-space
+          v-if="
+            canContractShowSettlementLog(row)
+              || canContractWinLose(row)
+              || canContractChangeDirection(row)
+          "
+        >
+          <action-button
+            v-if="canContractShowSettlementLog(row)"
+            v-access:code="['trade:contract:list']"
+            @click.stop="handleOpenSettlementLog(row)"
+          >
+            日志
+          </action-button>
+          <Popconfirm
+            v-if="canContractWinLose(row)"
+            placement="left"
+            title="确认将该订单控为必赢？"
+            @confirm="handleWin(row)"
+          >
+            <action-button
+              v-access:code="['trade:contract:list']"
+              @click.stop=""
+            >
+              赢
+            </action-button>
+          </Popconfirm>
+          <Popconfirm
+            v-if="canContractWinLose(row)"
+            placement="left"
+            title="确认将该订单控为必输？"
+            @confirm="handleLose(row)"
+          >
+            <action-button
+              v-access:code="['trade:contract:list']"
+              danger
+              @click.stop=""
+            >
+              输
+            </action-button>
+          </Popconfirm>
+          <action-button
+            v-if="canContractChangeDirection(row)"
+            v-access:code="['trade:contract:list']"
+            @click.stop="handleOpenDirection(row)"
+          >
+            交易方向
           </action-button>
         </table-action-space>
       </template>
     </BasicTable>
+    <DirectionModal @reload="tableApi.query()" />
+    <SettlementLogModal />
   </Page>
 </template>
