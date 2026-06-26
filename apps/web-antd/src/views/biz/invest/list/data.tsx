@@ -1,4 +1,4 @@
-/** 投信列表列表：筛选 schema 与表格列（字段对齐 InvestListItem） */
+/** 投信列表：筛选 schema 与表格列（字段对齐 fb_fund / Java fbfund.vue） */
 import type { FormSchemaGetter } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
@@ -6,20 +6,65 @@ import { getPopupContainer } from '@vben/utils';
 
 import { Image, Tag } from 'antdv-next';
 
-const statusOptions = [
-  { label: '上架', value: '0' },
-  { label: '下架', value: '1' },
-];
-
-const statusTagMap: Record<string, { color: string; label: string }> = {
-  '0': { color: 'success', label: '上架' },
-  '1': { color: 'default', label: '下架' },
+const statusTagMap: Record<number, { color: string; label: string }> = {
+  0: { color: 'warning', label: '禁用' },
+  1: { color: 'processing', label: '启用' },
 };
 
-const soldOutTagMap: Record<string, { color: string; label: string }> = {
-  '0': { color: 'success', label: '否' },
-  '1': { color: 'error', label: '是' },
+const soldOutTagMap: Record<number, { color: string; label: string }> = {
+  0: { color: 'success', label: '进行中' },
+  1: { color: 'default', label: '已售罄' },
 };
+
+const rateModeTagMap: Record<string, { color: string; label: string }> = {
+  RANGE: { color: 'warning', label: '区间' },
+  FIXED: { color: 'processing', label: '固定' },
+  range: { color: 'warning', label: '区间' },
+  fixed: { color: 'processing', label: '固定' },
+};
+
+/** 小数收益率 → 百分数字符串展示 */
+export function formatRatePercent(rate?: number | null) {
+  if (rate === null || rate === undefined) {
+    return '-';
+  }
+  const n = Number(rate) * 100;
+  if (!Number.isFinite(n)) {
+    return '-';
+  }
+  const rounded = Math.round(n * 100) / 100;
+  const nearestInt = Math.round(rounded);
+  if (Math.abs(rounded - nearestInt) < 1e-9) {
+    return String(nearestInt);
+  }
+  return rounded.toFixed(2).replace(/\.?0+$/, '');
+}
+
+export function formatAmount(value?: number | null) {
+  if (value === null || value === undefined) {
+    return '-';
+  }
+  const n = Number(value);
+  if (!Number.isFinite(n)) {
+    return '-';
+  }
+  return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+}
+
+/** 海报预览地址：相对路径拼 origin */
+export function resolvePosterSrc(poster?: string) {
+  const p = poster?.trim();
+  if (!p) {
+    return '';
+  }
+  if (p.startsWith('http://') || p.startsWith('https://') || p.startsWith('data:')) {
+    return p;
+  }
+  if (p.startsWith('/')) {
+    return `${window.location.origin}${p}`;
+  }
+  return p;
+}
 
 export const querySchema: FormSchemaGetter = () => [
   {
@@ -37,7 +82,10 @@ export const querySchema: FormSchemaGetter = () => [
       getPopupContainer,
       allowClear: true,
       class: 'w-[100px]',
-      options: statusOptions,
+      options: [
+        { label: '禁用', value: '0' },
+        { label: '启用', value: '1' },
+      ],
       placeholder: '状态',
     },
     fieldName: 'status',
@@ -50,8 +98,8 @@ export const querySchema: FormSchemaGetter = () => [
       allowClear: true,
       class: 'w-[100px]',
       options: [
-        { label: '否', value: '0' },
-        { label: '是', value: '1' },
+        { label: '进行中', value: '0' },
+        { label: '已售罄', value: '1' },
       ],
       placeholder: '售罄',
     },
@@ -72,7 +120,7 @@ export const querySchema: FormSchemaGetter = () => [
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
   {
-    field: 'investCode',
+    field: 'code',
     title: '投信代码',
     minWidth: 110,
     formatter({ cellValue }) {
@@ -80,7 +128,7 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'investName',
+    field: 'name',
     title: '投信名称',
     minWidth: 140,
     formatter({ cellValue }) {
@@ -88,25 +136,28 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'logo',
-    title: 'Logo',
+    field: 'poster',
+    title: '海报',
     minWidth: 80,
     slots: {
-      default: ({ row }) =>
-        row.logo ? (
+      default: ({ row }) => {
+        const src = resolvePosterSrc(row.poster);
+        return src ? (
           <Image
             class="rounded object-cover"
             height={32}
-            src={row.logo}
+            preview={{ src }}
+            src={src}
             width={48}
           />
         ) : (
           '-'
-        ),
+        );
+      },
     },
   },
   {
-    field: 'productDesc',
+    field: 'description',
     title: '产品描述',
     minWidth: 160,
     showOverflow: 'tooltip',
@@ -120,9 +171,9 @@ export const columns: VxeGridProps['columns'] = [
     minWidth: 80,
     slots: {
       default: ({ row }) => {
-        const item = statusTagMap[row.status] ?? {
+        const item = statusTagMap[Number(row.status)] ?? {
           color: 'default',
-          label: row.status || '-',
+          label: row.status ?? '-',
         };
         return <Tag color={item.color}>{item.label}</Tag>;
       },
@@ -131,79 +182,80 @@ export const columns: VxeGridProps['columns'] = [
   {
     field: 'soldOut',
     title: '售罄',
-    minWidth: 70,
+    minWidth: 90,
     slots: {
       default: ({ row }) => {
-        const item = soldOutTagMap[row.soldOut] ?? {
+        const item = soldOutTagMap[Number(row.soldOut)] ?? {
           color: 'default',
-          label: row.soldOut || '-',
+          label: row.soldOut ?? '-',
         };
         return <Tag color={item.color}>{item.label}</Tag>;
       },
     },
   },
   {
-    field: 'sortOrder',
+    field: 'sort',
     title: '排序',
     minWidth: 70,
     formatter({ cellValue }) {
-      return cellValue || '-';
+      return cellValue ?? '-';
     },
   },
   {
-    field: 'yieldDisplay',
+    field: 'rateMin',
     title: '收益率显示',
-    minWidth: 100,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    minWidth: 130,
+    slots: {
+      default: ({ row }) =>
+        `${formatRatePercent(row.rateMin)}% ~ ${formatRatePercent(row.rateMax)}%`,
     },
   },
   {
-    field: 'yieldRate',
+    field: 'rate',
     title: '收益率',
     minWidth: 90,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    slots: {
+      default: ({ row }) => `${formatRatePercent(row.rate)}%`,
     },
   },
   {
-    field: 'investableAmount',
+    field: 'maxAmount',
     title: '可投入金额',
-    minWidth: 110,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    minWidth: 140,
+    slots: {
+      default: ({ row }) =>
+        `${formatAmount(row.minAmount)}~${formatAmount(row.maxAmount)}`,
     },
   },
   {
-    field: 'minAddAmount',
+    field: 'minAppendAmount',
     title: '最低追投金额',
     minWidth: 120,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    slots: {
+      default: ({ row }) => formatAmount(row.minAppendAmount),
     },
   },
   {
     field: 'period',
     title: '周期',
     minWidth: 80,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    slots: {
+      default: ({ row }) => (row.period != null ? `${row.period}天` : '-'),
     },
   },
   {
-    field: 'yieldType',
+    field: 'rateMode',
     title: '收益率类型',
     minWidth: 100,
-    formatter({ cellValue }) {
-      return cellValue || '-';
-    },
-  },
-  {
-    field: 'expireDate',
-    title: '到期日',
-    minWidth: 110,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    slots: {
+      default: ({ row }) => {
+        const key = String(row.rateMode ?? '');
+        const item = rateModeTagMap[key] ?? {
+          color: 'default',
+          label: key || '-',
+        };
+        return <Tag color={item.color}>{item.label}</Tag>;
+      },
     },
   },
   {

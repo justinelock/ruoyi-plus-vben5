@@ -4,24 +4,23 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { InvestList } from '#/api/biz/invest/list/model';
 
-import { Page } from '@vben/common-ui';
+import { Page, useVbenModal } from '@vben/common-ui';
 
-import { Space } from 'antdv-next';
+import { Popconfirm } from 'antdv-next';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { investListList } from '#/api/biz/invest/list';
+import { investListList, investListRemove } from '#/api/biz/invest/list';
 
 import { bizInlineFormBase, bizTimeMapping } from '../../shared/form-options';
 import { columns, querySchema } from './data';
+import InvestFundModal from './invest-fund-modal.vue';
 
-// 1. 单行 inline 筛选 + createTime 时间范围映射（对接 GET /invest/list/list）
 const formOptions: VbenFormProps = {
   ...bizInlineFormBase,
   schema: querySchema(),
   fieldMappingTime: [bizTimeMapping('createTime')],
 };
 
-// 2. 分页表格
 const gridOptions: VxeGridProps = {
   checkboxConfig: { highlight: true, reserve: true, trigger: 'default' },
   columns,
@@ -44,11 +43,39 @@ const gridOptions: VxeGridProps = {
   id: 'invest-list-index',
 };
 
-const [BasicTable] = useVbenVxeGrid({ formOptions, gridOptions });
+const [BasicTable, tableApi] = useVbenVxeGrid({ formOptions, gridOptions });
 
-function handleView(_row: InvestList) {}
+const [FundModal, fundModalApi] = useVbenModal({
+  connectedComponent: InvestFundModal,
+});
 
-function handleExport() {}
+function handleAdd() {
+  fundModalApi.setData({});
+  fundModalApi.open();
+}
+
+function handleEdit(row: InvestList) {
+  fundModalApi.setData({ id: row.id });
+  fundModalApi.open();
+}
+
+async function handleDelete(row: InvestList) {
+  await investListRemove(row.id);
+  await tableApi.query();
+}
+
+async function handleBatchDelete() {
+  const rows = tableApi.grid.getCheckboxRecords() as InvestList[];
+  if (!rows?.length) {
+    return;
+  }
+  const ids = rows.map((r) => r.id).join(',');
+  await investListRemove(ids);
+  await tableApi.query();
+}
+
+/** 批量删除入口暂隐藏，改 true 即可恢复 */
+const showBatchDelete = false;
 </script>
 
 <template>
@@ -58,21 +85,34 @@ function handleExport() {}
         <a-button
           v-access:code="['invest:list:list']"
           type="primary"
-          @click="handleExport"
+          @click="handleAdd"
         >
-          导出
+          新增
         </a-button>
+        <Popconfirm
+          v-if="showBatchDelete"
+          title="确认删除所选投信？"
+          @confirm="handleBatchDelete"
+        >
+          <a-button v-access:code="['invest:list:list']" danger>批量删除</a-button>
+        </Popconfirm>
       </template>
       <template #action="{ row }">
         <table-action-space>
           <action-button
             v-access:code="['invest:list:list']"
-            @click.stop="handleView(row)"
+            @click.stop="handleEdit(row)"
           >
-            详情
+            修改
           </action-button>
+          <Popconfirm title="确认删除该投信？" @confirm="handleDelete(row)">
+            <action-button v-access:code="['invest:list:list']" danger>
+              删除
+            </action-button>
+          </Popconfirm>
         </table-action-space>
       </template>
     </BasicTable>
+    <FundModal @reload="tableApi.query()" />
   </Page>
 </template>
