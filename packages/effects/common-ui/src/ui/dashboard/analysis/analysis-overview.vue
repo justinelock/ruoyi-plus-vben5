@@ -29,24 +29,25 @@ const props = withDefaults(defineProps<Props>(), {
 /** 主数字样式：加粗，充值绿 / 提现红 */
 function mainValueClass(item: AnalysisOverviewItem) {
   const size = props.compact ? 'text-base' : 'text-xl';
-  const tone =
-    item.valueTone === 'success'
-      ? 'text-green-600'
-      : item.valueTone === 'danger'
-        ? 'text-red-500'
-        : '';
+  let tone = '';
+  if (item.valueTone === 'success') {
+    tone = 'text-green-600';
+  } else if (item.valueTone === 'danger') {
+    tone = 'text-red-500';
+  }
   return [size, 'font-bold', tone].filter(Boolean).join(' ');
 }
 
 /** 底部数字样式：金额行可与主数字分色（提现仅底部红色） */
 function footerValueClass(item: AnalysisOverviewItem) {
-  const tone = item.totalValuePrefix?.startsWith('-')
-    ? 'text-red-500'
-    : item.valueTone === 'success'
-      ? 'text-green-600'
-      : item.valueTone === 'danger'
-        ? 'text-red-500'
-        : '';
+  let tone = '';
+  if (item.totalValuePrefix?.startsWith('-')) {
+    tone = 'text-red-500';
+  } else if (item.valueTone === 'success') {
+    tone = 'text-green-600';
+  } else if (item.valueTone === 'danger') {
+    tone = 'text-red-500';
+  }
   return ['font-bold', tone].filter(Boolean).join(' ');
 }
 </script>
@@ -71,6 +72,7 @@ function footerValueClass(item: AnalysisOverviewItem) {
           <VbenCountToAnimator
             :end-val="item.value"
             :start-val="1"
+            :duration="0"
             :class="mainValueClass(item)"
             :decimals="item.valueDecimals ?? 0"
             :prefix="item.valuePrefix ?? ''"
@@ -87,7 +89,8 @@ function footerValueClass(item: AnalysisOverviewItem) {
           <span>{{ item.totalTitle }}</span>
           <VbenCountToAnimator
             :end-val="item.totalValue"
-            :start-val="1"
+            :start-val="1000"
+            :duration="0"
             :class="footerValueClass(item)"
             :decimals="item.totalValueDecimals ?? 0"
             :prefix="item.totalValuePrefix ?? ''"

@@ -11,12 +11,6 @@ import {
   AnalysisChartsTabs,
   AnalysisOverview,
 } from '@vben/common-ui';
-import {
-  SvgBellIcon,
-  SvgCakeIcon,
-  SvgCardIcon,
-  SvgDownloadIcon,
-} from '@vben/icons';
 
 import { RadioGroup, Spin, Tag } from 'antdv-next';
 
@@ -46,33 +40,33 @@ const overviewItems = ref<AnalysisOverviewItem[]>(buildOverviewItems());
 /** 将接口数据映射为 AnalysisOverview 四卡 */
 function buildOverviewItems(
   data?: Partial<{
-    pendingUserCount: number;
-    verifiedUserCount: number;
-    pendingUserWalletCount: number;
     approvedUserWalletCount: number;
     depositCount: number;
     depositSum: number;
+    pendingUserCount: number;
+    pendingUserWalletCount: number;
+    verifiedUserCount: number;
     withdrawCount: number;
     withdrawSum: number;
   }>,
 ): AnalysisOverviewItem[] {
   return [
     {
-      icon: SvgCardIcon,
+      icon: 'mdi:account-check',
       title: '实名认证',
       totalTitle: '已通过',
       value: data?.pendingUserCount ?? 0,
       totalValue: data?.verifiedUserCount ?? 0,
     },
     {
-      icon: SvgCakeIcon,
+      icon: 'mdi:wallet',
       title: '钱包申请',
       totalTitle: '已通过',
       value: data?.pendingUserWalletCount ?? 0,
       totalValue: data?.approvedUserWalletCount ?? 0,
     },
     {
-      icon: SvgDownloadIcon,
+      icon: 'mdi:cash-plus',
       title: '充值申请',
       totalTitle: '成功金额',
       value: data?.depositCount ?? 0,
@@ -82,13 +76,14 @@ function buildOverviewItems(
       totalValueDecimals: 2,
     },
     {
-      icon: SvgBellIcon,
+      icon: 'mdi:cash-minus',
       title: '提现申请',
       totalTitle: '成功金额',
       value: data?.withdrawCount ?? 0,
       totalValue: data?.withdrawSum ?? 0,
       valueTone: 'danger',
       totalValuePrefix: '-$ ',
+      totalValueDecimals: 2,
     },
   ];
 }
@@ -140,9 +135,9 @@ const chartTabs: TabOption[] = [
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
       <span class="text-base font-medium">业务概览</span>
       <div class="flex flex-wrap items-center gap-2">
-        <Tag color="processing" size="small"
-          >在线用户:{{ totalOnlineUsers }}</Tag
-        >
+        <Tag color="processing" size="small">
+          在线用户:{{ totalOnlineUsers }}
+        </Tag>
         <RadioGroup
           v-model:value="statisticsType"
           class="analytics-statistics-type"
