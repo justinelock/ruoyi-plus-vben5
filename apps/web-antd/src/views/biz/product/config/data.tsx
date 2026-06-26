@@ -1,4 +1,4 @@
-/** 产品配置列表：筛选 schema 与表格列（字段对齐 ProductConfigItem） */
+/** 产品配置列表：筛选与表格列（对齐 fb_fund_product / Java fbfundproduct.vue） */
 import type { FormSchemaGetter } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
@@ -6,17 +6,55 @@ import { getPopupContainer } from '@vben/utils';
 
 import { Tag } from 'antdv-next';
 
-const statusOptions = [
-  { label: '启用', value: '0' },
-  { label: '停用', value: '1' },
+const productTypeOptions = [
+  { label: '外汇', value: 'FOREX' },
+  { label: '股票', value: 'STOCK' },
+  { label: '投信', value: 'FUND' },
+  { label: '期货', value: 'FUTURE' },
+  { label: '指数', value: 'INDEX' },
+  { label: '期权', value: 'OPTION' },
 ];
 
-const statusTagMap: Record<string, { color: string; label: string }> = {
-  '0': { color: 'success', label: '启用' },
-  '1': { color: 'default', label: '停用' },
+const productTypeTagMap: Record<string, { color: string; label: string }> = {
+  STOCK: { color: 'processing', label: '股票' },
+  FOREX: { color: 'warning', label: '外汇' },
+  FUND: { color: 'success', label: '投信' },
+  FUTURE: { color: 'default', label: '期货' },
+  INDEX: { color: 'default', label: '指数' },
+  OPTION: { color: 'default', label: '期权' },
 };
 
+const marketLabelMap: Record<string, string> = {
+  STOCK_US: '美股',
+  STOCK_HK: '港股',
+  STOCK_CN: 'A股',
+  FOREX_US: '外汇美金',
+  FOREX_EUR: '外汇欧元',
+  FOREX_GBP: '外汇英镑',
+  FOREX_AUD: '外汇澳元',
+  FUND_STOCK: '股票投信',
+  FUND_BOND: '债券投信',
+  FUND_MIXED: '混合投信',
+  FUND_INDEX: '指数投信',
+};
+
+export const marketOptions = Object.entries(marketLabelMap).map(
+  ([value, label]) => ({ label, value }),
+);
+
 export const querySchema: FormSchemaGetter = () => [
+  {
+    component: 'Select',
+    componentProps: {
+      getPopupContainer,
+      allowClear: true,
+      class: 'w-[120px]',
+      options: productTypeOptions,
+      placeholder: '类型',
+    },
+    fieldName: 'type',
+    formItemClass: 'pb-0',
+  },
   {
     component: 'Input',
     fieldName: 'keyword',
@@ -27,21 +65,15 @@ export const querySchema: FormSchemaGetter = () => [
     formItemClass: 'pb-0',
   },
   {
-    component: 'Input',
-    fieldName: 'productType',
-    componentProps: {
-      placeholder: '产品类型',
-      class: 'w-[120px]',
-    },
-    formItemClass: 'pb-0',
-  },
-  {
     component: 'Select',
     componentProps: {
       getPopupContainer,
       allowClear: true,
       class: 'w-[100px]',
-      options: statusOptions,
+      options: [
+        { label: '禁用', value: '0' },
+        { label: '启用', value: '1' },
+      ],
       placeholder: '状态',
     },
     fieldName: 'status',
@@ -61,7 +93,7 @@ export const querySchema: FormSchemaGetter = () => [
 export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
   {
-    field: 'productCode',
+    field: 'code',
     title: '产品代码',
     minWidth: 110,
     formatter({ cellValue }) {
@@ -69,23 +101,23 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'productAlias',
+    field: 'alias',
     title: '产品别名',
-    minWidth: 110,
-    formatter({ cellValue }) {
-      return cellValue || '-';
-    },
-  },
-  {
-    field: 'symbol',
-    title: '交易对',
     minWidth: 100,
     formatter({ cellValue }) {
       return cellValue || '-';
     },
   },
   {
-    field: 'productName',
+    field: 'tradePair',
+    title: '交易对',
+    minWidth: 110,
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  {
+    field: 'name',
     title: '产品名称',
     minWidth: 140,
     formatter({ cellValue }) {
@@ -93,19 +125,28 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'productType',
+    field: 'type',
     title: '产品类型',
     minWidth: 90,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    slots: {
+      default: ({ row }) => {
+        const key = String(row.type ?? '');
+        const item = productTypeTagMap[key] ?? {
+          color: 'default',
+          label: key || '-',
+        };
+        return <Tag color={item.color}>{item.label}</Tag>;
+      },
     },
   },
   {
     field: 'market',
     title: '市场',
-    minWidth: 80,
-    formatter({ cellValue }) {
-      return cellValue || '-';
+    minWidth: 100,
+    slots: {
+      default: ({ row }) => (
+        <Tag>{marketLabelMap[row.market as string] ?? row.market ?? '-'}</Tag>
+      ),
     },
   },
   {
@@ -113,23 +154,22 @@ export const columns: VxeGridProps['columns'] = [
     title: '赔率',
     minWidth: 80,
     formatter({ cellValue }) {
-      return cellValue || '-';
+      return cellValue ?? '-';
     },
   },
   {
-    field: 'tradeTime',
+    field: 'tradingHours',
     title: '交易时间',
-    minWidth: 140,
+    minWidth: 180,
     showOverflow: 'tooltip',
     formatter({ cellValue }) {
       return cellValue || '-';
     },
   },
   {
-    field: 'currencies',
+    field: 'currency',
     title: '支持币种',
-    minWidth: 120,
-    showOverflow: 'tooltip',
+    minWidth: 90,
     formatter({ cellValue }) {
       return cellValue || '-';
     },
@@ -139,22 +179,24 @@ export const columns: VxeGridProps['columns'] = [
     title: '状态',
     minWidth: 80,
     slots: {
-      default: ({ row }) => {
-        const item = statusTagMap[row.status] ?? {
-          color: 'default',
-          label: row.status || '-',
-        };
-        return <Tag color={item.color}>{item.label}</Tag>;
-      },
+      default: ({ row }) => (
+        <Tag color={Number(row.status) === 1 ? 'processing' : 'warning'}>
+          {Number(row.status) === 1 ? '启用' : '禁用'}
+        </Tag>
+      ),
     },
   },
   {
-    field: 'createUpdateTime',
+    field: 'createTime',
     title: '创建/更新时间',
-    minWidth: 200,
+    minWidth: 180,
     slots: {
-      default: ({ row }) =>
-        `${row.createTime || '-'} / ${row.updateTime || '-'}`,
+      default: ({ row }) => (
+        <div class="text-sm leading-5">
+          <div>{row.createTime || '-'}</div>
+          <div>{row.updateTime || '-'}</div>
+        </div>
+      ),
     },
   },
   {

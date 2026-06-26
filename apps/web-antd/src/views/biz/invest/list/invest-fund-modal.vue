@@ -197,6 +197,8 @@ async function handleSubmit() {
     }
     emit('reload');
     modalApi.close();
+  } catch (error) {
+    console.error(error);
   } finally {
     modalApi.modalLoading(false);
   }

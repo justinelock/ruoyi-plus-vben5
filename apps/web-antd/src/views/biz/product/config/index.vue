@@ -4,24 +4,26 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { ProductConfig } from '#/api/biz/product/config/model';
 
-import { Page } from '@vben/common-ui';
+import { Page, useVbenModal } from '@vben/common-ui';
 
-import { Space } from 'antdv-next';
+import { Popconfirm } from 'antdv-next';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { productConfigList } from '#/api/biz/product/config';
+import {
+  productConfigList,
+  productConfigRemove,
+} from '#/api/biz/product/config';
 
 import { bizInlineFormBase, bizTimeMapping } from '../../shared/form-options';
 import { columns, querySchema } from './data';
+import ProductConfigModal from './product-config-modal.vue';
 
-// 1. 单行 inline 筛选 + createTime 时间范围映射（对接 GET /product/config/list）
 const formOptions: VbenFormProps = {
   ...bizInlineFormBase,
   schema: querySchema(),
   fieldMappingTime: [bizTimeMapping('createTime')],
 };
 
-// 2. 分页表格
 const gridOptions: VxeGridProps = {
   checkboxConfig: { highlight: true, reserve: true, trigger: 'default' },
   columns,
@@ -44,11 +46,26 @@ const gridOptions: VxeGridProps = {
   id: 'product-config-index',
 };
 
-const [BasicTable] = useVbenVxeGrid({ formOptions, gridOptions });
+const [BasicTable, tableApi] = useVbenVxeGrid({ formOptions, gridOptions });
 
-function handleView(_row: ProductConfig) {}
+const [ConfigModal, configModalApi] = useVbenModal({
+  connectedComponent: ProductConfigModal,
+});
 
-function handleExport() {}
+function handleAdd() {
+  configModalApi.setData({});
+  configModalApi.open();
+}
+
+function handleEdit(row: ProductConfig) {
+  configModalApi.setData({ id: row.id });
+  configModalApi.open();
+}
+
+async function handleDelete(row: ProductConfig) {
+  await productConfigRemove(row.id);
+  await tableApi.query();
+}
 </script>
 
 <template>
@@ -58,21 +75,27 @@ function handleExport() {}
         <a-button
           v-access:code="['product:config:list']"
           type="primary"
-          @click="handleExport"
+          @click="handleAdd"
         >
-          导出
+          新增
         </a-button>
       </template>
       <template #action="{ row }">
         <table-action-space>
           <action-button
             v-access:code="['product:config:list']"
-            @click.stop="handleView(row)"
+            @click.stop="handleEdit(row)"
           >
-            详情
+            编辑
           </action-button>
+          <Popconfirm title="确认删除该产品？" @confirm="handleDelete(row)">
+            <action-button v-access:code="['product:config:list']" danger>
+              删除
+            </action-button>
+          </Popconfirm>
         </table-action-space>
       </template>
     </BasicTable>
+    <ConfigModal @reload="tableApi.query()" />
   </Page>
 </template>
