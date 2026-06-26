@@ -7,7 +7,8 @@ import { usePreferences } from '@vben/preferences';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 
-import { type LanguageSupport, languageSupportMap } from './data';
+import { languageSupportMap } from './data';
+import type { LanguageSupport } from './data';
 
 const props = withDefaults(
   defineProps<{
@@ -28,6 +29,8 @@ const props = withDefaults(
 
 const codeMirrorRef =
   useTemplateRef<InstanceType<typeof CodeMirror>>('codeMirrorRef');
+// 模板 ref 绑定，供父组件通过 expose 访问
+void codeMirrorRef;
 
 const { isDark } = usePreferences();
 

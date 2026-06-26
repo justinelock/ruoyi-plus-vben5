@@ -6,8 +6,6 @@ import type { TradeEntrust } from '#/api/biz/trade/entrust/model';
 
 import { Page } from '@vben/common-ui';
 
-import { Space } from 'antdv-next';
-
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { tradeEntrustList } from '#/api/biz/trade/entrust';
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { CheckboxChangeEvent } from 'antdv-next/es/checkbox/interface';
-import type { DataNode } from 'antdv-next/es/tree';
+import type { DataNode } from 'antdv-next/dist/tree';
 
 import { computed, nextTick, onMounted, ref } from 'vue';
 
@@ -94,7 +93,7 @@ const allKeys = computed(() => {
   return treeToList(props.treeData).map((item: any) => item[idField]);
 });
 
-function handleCheckedAllChange(e: CheckboxChangeEvent) {
+function handleCheckedAllChange(e: { target: { checked: boolean } }) {
   // 这个用于展示
   checkedKeys.value = e.target.checked ? allKeys.value : [];
 }

@@ -170,6 +170,10 @@ pkill -f './bin/traefik/traefik'
 ./bin/traefik/traefik --configfile=./bin/traefik/traefik.yaml
 ```
 
+```shell
+ ./scripts/ngrok http --domain=malaceous-clifford-acinous.ngrok-free.dev 5666
+```
+
 ## 这是一个特性 而不是一个bug!
 
 1. 菜单管理可分配 但只有`admin`/`superadmin`角色能访问 其他角色访问会到403页面

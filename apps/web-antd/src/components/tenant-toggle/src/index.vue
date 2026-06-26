@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { SelectEmits } from 'antdv-next';
 import type { MessageType } from 'antdv-next/dist/message/interface';
 
 import type { TenantOption } from '#/api';
@@ -73,10 +72,7 @@ const loading = ref(false);
  * @param tenantId tenantId
  * @param option 当前option
  */
-const handleSelect: SelectEmits['onSelect'] = async (
-  tenantId: string,
-  option: any,
-) => {
+const handleSelect = async (tenantId: string, option: any) => {
   if (unref(lastSelected) === tenantId) {
     // createMessage.info('选择一致');
     return;

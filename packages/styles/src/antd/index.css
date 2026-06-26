@@ -1,4 +1,5 @@
 @reference "tailwindcss";
+
 /* antdv-next 组件库的一些样式重置 */
 
 body {
@@ -13,7 +14,9 @@ body {
 .ant-app {
   width: 100%;
   height: 100%;
+
   /* 会导致页面无法滚动 */
+
   /* overscroll-behavior: none; */
   color: inherit;
 }
@@ -52,7 +55,7 @@ body {
 
 .form-valid-error {
   /** select 选择器的样式 */
-  --vben-form-error-shadow: 0 0 0 2px rgba(255, 35, 5, 0.1);
+  --vben-form-error-shadow: 0 0 0 2px rgb(255 35 5 / 10%);
 
   .ant-select:not(.valid-success) .ant-select-selector:not(.valid-success) {
     border-color: hsl(var(--destructive)) !important;
@@ -86,6 +89,7 @@ body {
   .ant-picker-outlined:focus-within {
     border-color: hsl(var(--destructive));
   }
+
   /* focus样式 shadow */
   .ant-select.ant-select-outlined:not(.ant-select-disabled).ant-select-focused {
     /* --ant-select-active-outline-color: var(--vben-form-error-shadow); */

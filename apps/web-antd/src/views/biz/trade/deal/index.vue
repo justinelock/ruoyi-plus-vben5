@@ -6,8 +6,6 @@ import type { TradeDeal } from '#/api/biz/trade/deal/model';
 
 import { Page } from '@vben/common-ui';
 
-import { Space } from 'antdv-next';
-
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { tradeDealList } from '#/api/biz/trade/deal';
 

@@ -6,8 +6,6 @@ import type { KlineMain } from '#/api/biz/kline/main/model';
 
 import { Page } from '@vben/common-ui';
 
-import { Space } from 'antdv-next';
-
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { klineMainList } from '#/api/biz/kline/main';
 

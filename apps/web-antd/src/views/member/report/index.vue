@@ -7,8 +7,6 @@ import type { MemberReport } from '#/api/member/report/model';
 import { useVbenDrawer } from '@vben/common-ui';
 import { Page } from '@vben/common-ui';
 
-import { Space } from 'antdv-next';
-
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { memberReportList } from '#/api/member/report';
 

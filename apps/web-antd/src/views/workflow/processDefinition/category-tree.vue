@@ -74,19 +74,17 @@ function handleSelect(keys: Key[]) {
         class="bg-background flex h-full flex-col overflow-y-auto rounded-lg"
       >
         <!-- 固定在顶部 必须加上bg-background背景色 否则会产生'穿透'效果 -->
-        <div class="bg-background z-100 sticky left-0 top-0 p-[8px]">
+        <div class="bg-background z-100 sticky left-0 top-0 flex gap-1 p-[8px]">
           <InputSearch
             v-model:value="searchValue"
             :placeholder="$t('pages.common.search')"
             size="small"
             allow-clear
-          >
-            <template #enterButton>
-              <a-button @click="handleReload">
-                <SyncOutlined class="text-primary" />
-              </a-button>
-            </template>
-          </InputSearch>
+            class="flex-1"
+          />
+          <a-button size="small" @click="handleReload">
+            <SyncOutlined class="text-primary" />
+          </a-button>
         </div>
         <div class="h-full overflow-x-hidden px-[8px]">
           <!-- TODO: 适配antdv-next -->
@@ -108,7 +106,7 @@ function handleSelect(keys: Key[]) {
               },
             }"
           >
-            <template #title="{ label }">
+            <template #titleRender="{ label }">
               <span v-if="label.includes(searchValue)">
                 {{ label.substring(0, label.indexOf(searchValue)) }}
                 <span class="text-primary">{{ searchValue }}</span>

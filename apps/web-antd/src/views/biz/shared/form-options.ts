@@ -18,9 +18,8 @@ export const bizTimeMapping = (
   field: string,
   begin = 'params[beginTime]',
   end = 'params[endTime]',
-) =>
-  [
-    field,
-    [begin, end],
-    ['YYYY-MM-DD 00:00:00', 'YYYY-MM-DD 23:59:59'],
-  ] as const;
+): [string, [string, string], [string, string]] => [
+  field,
+  [begin, end],
+  ['YYYY-MM-DD 00:00:00', 'YYYY-MM-DD 23:59:59'],
+];

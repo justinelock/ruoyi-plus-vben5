@@ -4,24 +4,22 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { NotifyNews } from '#/api/biz/notify/news/model';
 
-import { Page } from '@vben/common-ui';
-
-import { Space } from 'antdv-next';
+import { Page, useVbenModal } from '@vben/common-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { notifyNewsList } from '#/api/biz/notify/news';
 
 import { bizInlineFormBase, bizTimeMapping } from '../../shared/form-options';
 import { columns, querySchema } from './data';
+import NotifyNewsModal from './notify-news-modal.vue';
 
-// 1. 单行 inline 筛选 + publishTime 时间范围映射（对接 GET /notify/news/list）
 const formOptions: VbenFormProps = {
   ...bizInlineFormBase,
   schema: querySchema(),
+  // publishTime 映射为 params[beginTime]/params[endTime]
   fieldMappingTime: [bizTimeMapping('publishTime')],
 };
 
-// 2. 分页表格
 const gridOptions: VxeGridProps = {
   checkboxConfig: { highlight: true, reserve: true, trigger: 'default' },
   columns,
@@ -44,11 +42,21 @@ const gridOptions: VxeGridProps = {
   id: 'notify-news-index',
 };
 
-const [BasicTable] = useVbenVxeGrid({ formOptions, gridOptions });
+const [BasicTable, tableApi] = useVbenVxeGrid({ formOptions, gridOptions });
 
-function handleView(_row: NotifyNews) {}
+const [NewsModal, newsModalApi] = useVbenModal({
+  connectedComponent: NotifyNewsModal,
+});
 
-function handleExport() {}
+function handleAdd() {
+  newsModalApi.setData({});
+  newsModalApi.open();
+}
+
+function handleEdit(row: NotifyNews) {
+  newsModalApi.setData({ id: row.id });
+  newsModalApi.open();
+}
 </script>
 
 <template>
@@ -58,21 +66,22 @@ function handleExport() {}
         <a-button
           v-access:code="['notify:news:list']"
           type="primary"
-          @click="handleExport"
+          @click="handleAdd"
         >
-          导出
+          新增
         </a-button>
       </template>
       <template #action="{ row }">
         <table-action-space>
           <action-button
             v-access:code="['notify:news:list']"
-            @click.stop="handleView(row)"
+            @click.stop="handleEdit(row)"
           >
-            详情
+            编辑
           </action-button>
         </table-action-space>
       </template>
     </BasicTable>
+    <NewsModal @reload="tableApi.query()" />
   </Page>
 </template>

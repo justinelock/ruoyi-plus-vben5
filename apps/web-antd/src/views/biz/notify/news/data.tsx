@@ -1,4 +1,4 @@
-/** 市场新闻列表：筛选 schema 与表格列（字段对齐 NotifyNewsItem） */
+/** 市场新闻列表：筛选与表格列（对齐 fb_market_news / Java fbmarketnews.vue） */
 import type { FormSchemaGetter } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
@@ -55,15 +55,6 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'content',
-    title: '新闻内容',
-    minWidth: 200,
-    showOverflow: 'tooltip',
-    formatter({ cellValue }) {
-      return cellValue || '-';
-    },
-  },
-  {
     field: 'source',
     title: '新闻来源',
     minWidth: 100,
@@ -72,7 +63,16 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'link',
+    field: 'category',
+    title: '新闻分类',
+    minWidth: 120,
+    showOverflow: 'tooltip',
+    formatter({ cellValue }) {
+      return cellValue || '-';
+    },
+  },
+  {
+    field: 'url',
     title: '新闻链接',
     minWidth: 160,
     showOverflow: 'tooltip',
@@ -81,16 +81,16 @@ export const columns: VxeGridProps['columns'] = [
     },
   },
   {
-    field: 'image',
+    field: 'imageUrl',
     title: '新闻图片',
     minWidth: 100,
     slots: {
       default: ({ row }) =>
-        row.image ? (
+        row.imageUrl ? (
           <Image
-            class="rounded object-cover"
+            class="rounded-sm object-cover"
             height={32}
-            src={row.image}
+            src={row.imageUrl}
             width={48}
           />
         ) : (
@@ -103,7 +103,7 @@ export const columns: VxeGridProps['columns'] = [
     title: '浏览次数',
     minWidth: 90,
     formatter({ cellValue }) {
-      return cellValue || '-';
+      return cellValue ?? '-';
     },
   },
   {

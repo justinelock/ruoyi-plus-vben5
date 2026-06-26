@@ -6,8 +6,6 @@ import type { NotifyPublish } from '#/api/biz/notify/publish/model';
 
 import { Page } from '@vben/common-ui';
 
-import { Space } from 'antdv-next';
-
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { notifyPublishList } from '#/api/biz/notify/publish';
 
