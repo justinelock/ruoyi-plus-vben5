@@ -16,7 +16,10 @@ export const authStatusOptions = [
 ];
 
 /** 列表/详情共用：认证状态 Tag 配色与文案 */
-export const authStatusTagMap: Record<string, { color: string; label: string }> = {
+export const authStatusTagMap: Record<
+  string,
+  { color: string; label: string }
+> = {
   UNVERIFIED: { color: 'default', label: '未认证' },
   VERIFIED: { color: 'success', label: '已通过' },
   PENDING: { color: 'processing', label: '认证中' },

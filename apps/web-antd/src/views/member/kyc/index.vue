@@ -10,6 +10,7 @@ import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { memberKycList } from '#/api/member/kyc';
 
 import { columns, querySchema } from './data';
+import kycAuditModal from './kyc-audit-modal.vue';
 import kycDetailModal from './kyc-detail-modal.vue';
 
 // 1. 单行 inline 筛选（与用户列表同布局）
@@ -77,7 +78,7 @@ const gridOptions: VxeGridProps = {
   id: 'member-kyc-index',
 };
 
-const [BasicTable] = useVbenVxeGrid({
+const [BasicTable, tableApi] = useVbenVxeGrid({
   formOptions,
   gridOptions,
 });
@@ -86,13 +87,18 @@ const [KycDetailModal, kycDetailModalApi] = useVbenModal({
   connectedComponent: kycDetailModal,
 });
 
+const [KycAuditModal, kycAuditModalApi] = useVbenModal({
+  connectedComponent: kycAuditModal,
+});
+
 function handleView(row: MemberKyc) {
   kycDetailModalApi.setData(row);
   kycDetailModalApi.open();
 }
 
-function handleAudit(_row: MemberKyc) {
-  // 审核通过/拒绝待业务接口就绪后接入
+function handleAudit(row: MemberKyc) {
+  kycAuditModalApi.setData(row);
+  kycAuditModalApi.open();
 }
 
 function handleExport() {
@@ -131,5 +137,6 @@ function handleExport() {
       </template>
     </BasicTable>
     <KycDetailModal />
+    <KycAuditModal @reload="tableApi.query()" />
   </Page>
 </template>

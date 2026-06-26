@@ -10,6 +10,7 @@ import { useVbenModal } from '@vben/common-ui';
 import { Descriptions, Image } from 'antdv-next';
 
 import { renderAuthStatus } from './data';
+import { resolveKycImageUrl } from './kyc-image';
 
 const kycRecord = ref<MemberKyc>();
 
@@ -25,22 +26,6 @@ const [BasicModal, modalApi] = useVbenModal({
     kycRecord.value = undefined;
   },
 });
-
-/** 证件图：完整 URL 原样返回，相对路径走当前站点（生产 nginx /ids 静态目录） */
-function resolveKycImageUrl(path?: string) {
-  const trimmed = path?.trim();
-  if (!trimmed) {
-    return '';
-  }
-  if (
-    trimmed.startsWith('http://') ||
-    trimmed.startsWith('https://') ||
-    trimmed.startsWith('data:')
-  ) {
-    return trimmed;
-  }
-  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
-}
 
 const items = computed<DescriptionsProps['items']>(() => {
   if (!kycRecord.value) {

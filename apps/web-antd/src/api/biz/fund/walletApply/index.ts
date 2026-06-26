@@ -15,6 +15,7 @@ enum Api {
   detail = '/fund/walletApply/detail',
   list = '/fund/walletApply/list',
   loginLog = '/fund/walletApply/loginLog',
+  verify = '/fund/walletApply/verify',
 }
 
 /**
@@ -56,4 +57,13 @@ export function fundWalletApplyLoginLog(
     `${Api.loginLog}/${userId}`,
     { params },
   );
+}
+
+/** 钱包申请审核（对齐 Java PUT /verify） */
+export function fundWalletApplyVerify(data: {
+  id: string;
+  remark: string;
+  state: 'APPROVED' | 'REJECTED';
+}) {
+  return alovaInstance.putWithMsg<void>(Api.verify, data);
 }

@@ -10,6 +10,7 @@ import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { fundWalletApplyList } from '#/api/biz/fund/walletApply';
 
 import { columns, querySchema } from './data';
+import WalletApplyAuditModal from './wallet-apply-audit-modal.vue';
 import WalletApplyDetailModal from './wallet-apply-detail-modal.vue';
 import WalletApplyFlowDrawer from './wallet-apply-flow-drawer.vue';
 import WalletApplyLoginLogDrawer from './wallet-apply-login-log-drawer.vue';
@@ -58,10 +59,14 @@ const gridOptions: VxeGridProps = {
   id: 'fund-wallet-apply-index',
 };
 
-const [BasicTable] = useVbenVxeGrid({ formOptions, gridOptions });
+const [BasicTable, tableApi] = useVbenVxeGrid({ formOptions, gridOptions });
 
 const [DetailModal, detailModalApi] = useVbenModal({
   connectedComponent: WalletApplyDetailModal,
+});
+
+const [AuditModal, auditModalApi] = useVbenModal({
+  connectedComponent: WalletApplyAuditModal,
 });
 
 const [FlowDrawer, flowDrawerApi] = useVbenDrawer({
@@ -99,7 +104,10 @@ function handleLoginLog(row: FundWalletApply) {
   openUserDrawer(loginLogDrawerApi, row);
 }
 
-function handleAudit(_row: FundWalletApply) {}
+function handleAudit(row: FundWalletApply) {
+  auditModalApi.setData(row);
+  auditModalApi.open();
+}
 function handleExport() {}
 </script>
 
@@ -148,5 +156,6 @@ function handleExport() {}
     <DetailModal />
     <FlowDrawer />
     <LoginLogDrawer />
+    <AuditModal @reload="tableApi.query()" />
   </Page>
 </template>

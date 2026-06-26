@@ -23,6 +23,7 @@ import { RadioGroup, Spin, Tag } from 'antdv-next';
 import { dashboardStatistics } from '#/api/dashboard';
 import { memberUserStats } from '#/api/member/user';
 
+import AnalyticsShortcutLists from './analytics-shortcut-lists.vue';
 import AnalyticsTrends from './analytics-trends.vue';
 import AnalyticsVisitsData from './analytics-visits-data.vue';
 import AnalyticsVisitsSales from './analytics-visits-sales.vue';
@@ -139,7 +140,9 @@ const chartTabs: TabOption[] = [
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
       <span class="text-base font-medium">业务概览</span>
       <div class="flex flex-wrap items-center gap-2">
-        <Tag color="processing" size="small">在线用户:{{ totalOnlineUsers }}</Tag>
+        <Tag color="processing" size="small"
+          >在线用户:{{ totalOnlineUsers }}</Tag
+        >
         <RadioGroup
           v-model:value="statisticsType"
           class="analytics-statistics-type"
@@ -153,6 +156,10 @@ const chartTabs: TabOption[] = [
     <Spin :spinning="loading">
       <AnalysisOverview compact :items="overviewItems" />
     </Spin>
+    <AnalyticsShortcutLists
+      :statistics-type="statisticsType"
+      @changed="loadStatistics"
+    />
     <AnalysisChartsTabs :tabs="chartTabs" class="mt-5">
       <template #trends>
         <AnalyticsTrends />
